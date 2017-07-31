@@ -1,0 +1,1052 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="算法,机器学习,推荐系统,大数据," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.png?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要&amp;emsp;&amp;emsp;很多的推荐系统使用协同过滤技（CF）术向用户推荐相关事物，该技术是基于用户之前的浏览历史，购买记录或评价。大部分协同过滤技术主要解决两个主要问题。这两个主要问题就是用户资料的可扩展性和稀疏性。本文，我们将会描述加权正则化交替最小二乘法（Alternating-Least-Squares with Weighted-$\lambda$-Regularization，ALS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="大规模并行协同过滤算法">
+<meta property="og:url" content="http://yoursite.com/2016/12/25/大规模并行协同过滤算法/index.html">
+<meta property="og:site_name" content="djjowfy">
+<meta property="og:description" content="摘要&amp;emsp;&amp;emsp;很多的推荐系统使用协同过滤技（CF）术向用户推荐相关事物，该技术是基于用户之前的浏览历史，购买记录或评价。大部分协同过滤技术主要解决两个主要问题。这两个主要问题就是用户资料的可扩展性和稀疏性。本文，我们将会描述加权正则化交替最小二乘法（Alternating-Least-Squares with Weighted-$\lambda$-Regularization，ALS">
+<meta property="og:updated_time" content="2017-01-13T05:48:54.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="大规模并行协同过滤算法">
+<meta name="twitter:description" content="摘要&amp;emsp;&amp;emsp;很多的推荐系统使用协同过滤技（CF）术向用户推荐相关事物，该技术是基于用户之前的浏览历史，购买记录或评价。大部分协同过滤技术主要解决两个主要问题。这两个主要问题就是用户资料的可扩展性和稀疏性。本文，我们将会描述加权正则化交替最小二乘法（Alternating-Least-Squares with Weighted-$\lambda$-Regularization，ALS">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/12/25/大规模并行协同过滤算法/"/>
+
+
+
+
+
+  <title>大规模并行协同过滤算法 | djjowfy</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?9d159d45332b341a4f20f312239b79f4";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">djjowfy</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/25/大规模并行协同过滤算法/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="djjowfy">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="djjowfy">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">大规模并行协同过滤算法</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-12-25T12:00:00+08:00">
+                2016-12-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/翻译/" itemprop="url" rel="index">
+                    <span itemprop="name">翻译</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/12/25/大规模并行协同过滤算法/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2016/12/25/大规模并行协同过滤算法/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2016/12/25/大规模并行协同过滤算法/" class="leancloud_visitors" data-flag-title="大规模并行协同过滤算法">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h1><p>&emsp;&emsp;很多的推荐系统使用协同过滤技（CF）术向用户推荐相关事物，该技术是基于用户之前的浏览历史，购买记录或评价。大部分协同过滤技术主要解决两个主要问题。这两个主要问题就是用户资料的可扩展性和稀疏性。本文，我们将会描述加权正则化交替最小二乘法（Alternating-Least-Squares with Weighted-$\lambda$-Regularization，ALS-WR）。它是我们为Netflix Prize(一个大规模协同过滤挑战)设计的并行算法。我们在linux集群中使用并行Matlab作为实验平台。我们将进行实验得出一个结论：ALS-WR的性能会伴随着特征值数量和ALS迭代的增加而增加。ALS-WR应用多达1000个隐藏特征的NetFlix数据集，可得到一个0.8985的RMSE分数，这个得分是基于单纯方法获得的最好的得分。结合其他并行版本的方法，我们获得了比Netflix自身的CineMatch推荐系统高出5.91%的性能。我们的方法是简单的，对于很大的数据集的缩放也是表现很好的。<br><a id="more"></a></p>
+<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>&emsp;&emsp;推荐系统尝试基于可用的信息向潜在的客户推荐如电影，音乐，网页，商品等事物。可想而知，一个成功的推荐系统能够明显的提升电子商务公司的收入或促进社交网站上用户的交互。在众多的推荐系统中，基于内容的方法当然是要去分析对应的内容（如文本，元数据，特征）来决定相似的事物，然后协同过滤对大量用户的行为/爱好向指定用户推荐相似事物。协同过滤在Amazon[<a href="#16">16</a>],Netflix[<a href="#2">2</a>],Google News[<a href="#7">7</a>]等很多公司中都有使用。</p>
+<p>&emsp;&emsp;Netflix Prize这个项目是由Netflix主持的大型的数据挖掘竞争项目，主要目的是为了寻找最好的推荐系统算法来预测用户对电影的评分。它是基于一个超过据480000个用户和将近18000部电影的多于1亿得分的训练集的情况下完成的。每个训练数据有用户，电影，日期，评分四个元素组成，评分是一个介于1到5的值。测试数据集是由2800000个数据节点和评分组成，目标是在预测评分时将RMSE（均方根误差）的值最小化。Netflix自身的推荐系统在测试数据集上的得分是0.9514，Netflix Prize这个项目的目标是获得比该得分高出10%的解决方案。</p>
+<p>&emsp;&emsp;该问题展示了一系列的挑战（所以到目前为止，奖金还未被参赛者赢取）。第一个挑战是数据集比之前的基准数据集还要大100倍，这会消耗大量的模型训练时间和系统内存要求。第二个挑战是只有1%的用户-电影矩阵是在观察中的，大部分潜在的评分都是不可见的。第三个挑战是由于用户行为训练数据集和测试数据集都会存在脏数据，我们不能期望用户是完全可预测的。第四个挑战是每个训练和测试数据集中的用户评分分布是不同的，因为训练数据集是由1995-2005年之间的数据组成而测试数据集是由2006年的评分组成。特别的，评分少的用户在测试集中是更为普遍的。直观来讲，预测一个在训练集中表示为稀疏的用户的评分是一件很困难的事情。</p>
+<p>&emsp;&emsp;在此论文中，我们将会详细讨论该问题，接着会描述一个并行算法：加权正则化交替最小二乘法。我们在linux集群中使用并行Matlab作为实验平台。并且我们的核心算法对于庞大的稀疏数据来说是并行且最优化的。当我们采用所提及的方法去解决Netflix Prize问题时，相比Netflix自己的CineMatch系统，我们得到了5.91%的性能改进。</p>
+<p>&emsp;&emsp;这篇文章剩下的部分将如下组织：在第二部分，我们将介绍问题公式化。在第三部分，我将描述我们新奇的并行交替最小二乘算法。在第四部分，我们将描述实验来表现我们方案的威力。第五部分描述相关工作，然后第六部分包括了一下未来的研究方向。</p>
+<h1 id="问题公式化"><a href="#问题公式化" class="headerlink" title="问题公式化"></a>问题公式化</h1><p>&emsp;&emsp;使$R = { \lbrace r_{ij} \rbrace}_{n_u \times n_m}$代表一个用户-电影矩阵，其中$ r_{ij} $表示$i$用户对$j$电影的评级分数，这个评级分数可以是一个实数或是零的。$n_r$指定了用户数量，并且$n_m$指定了电影数量。在许多的推荐系统中，其任务就是根据已知的值去估算$R$中那些未知的值。</p>
+<p>&emsp;&emsp;我们从矩阵$R$的一个低秩近似值开始讲起。我们可以用一个低维的特征空间中的坐标来表示一个用户和电影的近似模型。每个用户电影都存在一个特征向量,并且每个用户对电影作出的评级(已知和未知的)可用用户和电影的特征向进行内积来建模。更为特别的是，可用$U = [\mathbf{u_i}]$代表用户的特征矩阵，其中对于所有的$i = 1 \cdots n_m$来说，$\mathbf{u_i}\subseteq \mathbb{R}^{n_f}$。然后用$M = [\mathbf{m_j}]$表示电影特征矩阵，其中对于所有的$j = 1 \cdots n_m$来说，$\mathbf{m_j}\subseteq \mathbb{R}^{n_f}$。这里的$n_f$是特征空间的维数，也就是模型中隐藏变量的数量。这是个系统参数。而这个系统参数是由数据集的属性或者说交叉验证决定的。如果用户评级是完全可以预测的并且$n_f$也足够的大，我们可以期望$r_{ij} = &lt;\mathbf{u_i},\mathbf{m_j}&gt;,\forall i,j $。然后在实验当中，我们最小化一个关于$U$和$M$的损失函数来获得矩阵$U$和$M$。在本文中，我们将会学习这个均方损失函数，该损失是由于一个单一等级所决定的，把它是作为平方误差：</p>
+<script type="math/tex; mode=display">
+\mathcal{L}^2(r,\mathbf{u},\mathbf{m})=(r-<\mathbf{u},\mathbf{m}>)^2. \label{1}</script><p>&emsp;&emsp;接下来我们能定义这个实验上的总损失（对于一个给定的$U$和$M$对来说）作为所有知道的$Eq.(2)$的等级的损失和。</p>
+<script type="math/tex; mode=display">
+\mathcal{L}^{emp}(R,U,M)={\frac 1 n} \sum_{(i,j)\in I} \mathcal {L}^2(r_{ij},\mathbf{u_i},\mathbf{m_j}), \label{2}</script><p>&emsp;&emsp;在上式中，已知的等级用$I$来表示索引，用$n$来表示$I$的大小。</p>
+<p>&emsp;&emsp;我们可以把低阶近似问题用以下式子来表示：</p>
+<script type="math/tex; mode=display">
+(U,M)=arg\ \mathop{min}_{(U,M)}\ \mathcal{L}^{emp}(R,U,M). \label{3}</script><p>&emsp;&emsp;在上式中$U$和$M$都是实矩阵，有$n_f$列，没有其他的约束。</p>
+<p>&emsp;&emsp;在这个问题中，$(Eq.(3))$里面有$(n_u + n_m)\times n_f$个自由变量。在另外一方面中，已经知道的评级集合$I$相比$n_un_m$有少的多的元素,因为对于看完并且对所有的18000部电影都做评级的用户是极少数的。用一个稀疏矩阵求解$Eq.(3)$的许多参数（当$n_f$比较大时），经常对数据过拟合。为了避免过拟合，给一般方法附加上Tikhonov正则化变成经验风险函数$(Eq.(4))$</p>
+<script type="math/tex; mode=display">
+\mathcal {L}^{reg}_{\lambda}(R,U,M)=\mathcal{L}^{emp}(R,U,M) 
+ +\lambda(||U\Gamma_U||^2+||M\Gamma_M||^2),  \label{4}</script><p>&emsp;&emsp;我们将在下一部分详细讨论如何选取恰当的Tikhonov矩阵$\Gamma_U$和$\Gamma_M$。</p>
+<h1 id="我们的方案"><a href="#我们的方案" class="headerlink" title="我们的方案"></a>我们的方案</h1><p>&emsp;&emsp;在这个部分，我们将描述一个迭代算法，就叫加权正则化交替最小二乘法（Alternating-Least-Squares with Weighted-$\lambda$-Regularization，ALS-WR），用来解决低秩近似值的问题。然后我们将展示一个基于并行Matlab平台的ALS-WR的并行实现。</p>
+<h2 id="加权正则化交替最小二乘法（ALS-with-Weight-lambda-Regularization）"><a href="#加权正则化交替最小二乘法（ALS-with-Weight-lambda-Regularization）" class="headerlink" title="加权正则化交替最小二乘法（ALS with Weight-$\lambda$-Regularization）"></a>加权正则化交替最小二乘法（ALS with Weight-$\lambda$-Regularization）</h2><p>&emsp;&emsp;由于评级矩阵同时包含信号和脏数据，重要的是移除脏数据和使用恢复的信号来预测为0的评分。奇异值分解（SVD）是一种估算原生用户-电影评分矩阵$R$的方法，它使用两个秩为$k$的矩阵$\mathop{R}\limits^{\thicksim} = U^T \times M$进行估计。当$R- \mathop{R}\limits^{\thicksim}$的F-范数最小时，SVD就是所需要的结果。这个目标也就相当于使$R$里面的所有元素的RMSE最小。然而，就像评级矩阵$R$中有很多元素都为0一样，基本的SVD算法不可能找到$U$和$M$。</p>
+<p>&emsp;&emsp;在这篇文章中，我们采用交替最小二乘法(ALS)来解决低秩矩阵因子分解问题。采取以下步骤：</p>
+<p>&emsp;&emsp;<strong>步骤一</strong>使用指定电影的平均评级作为矩阵$M$的第一行，余下的行值使用小的随机值来填充。</p>
+<p>&emsp;&emsp;<strong>步骤二</strong>固定$M$,解出使目标函数(平方误差)最小的$U$</p>
+<p>&emsp;&emsp;<strong>步骤三</strong>固定$U$,解出使目标函数(平方误差)最小的$M$</p>
+<p>&emsp;&emsp;<strong>步骤四</strong>重复步奏二和步奏三直到满足终止条件</p>
+<p>&emsp;&emsp;这里使用的停止标准是基于在探测数据集上观测的RMSE，更新$U$和$M$的一次循环之后，如果探测数据集上的观测的RMSE之间的差异小于1个基点，那么该循环就会停止.我们将会使用获得的$U$,$M$来对测试数据集做最后一个预测。该探测数据集是由Netflix提供的，它与那些隐藏的测试数据集有相同的分布。</p>
+<p>&emsp;&emsp;正如之前的第二节中所提到的一样，数据集中存在许多的自由参数。在没有正则化的情况下，ALS可能会导致过度拟合。一种常见的解决方法是采用Tikhonov正则化，它就是采用惩罚项来解决的。我们尝试了许多的正则化矩阵，最终我们发现$\lambda$加权的正则化（weighted-$\lambda$-regularization）是工作的最好的，因为当我们增加了特征数目或者迭代次数后，它对测试数据集从不过拟合。</p>
+<script type="math/tex; mode=display">
+f(U,M) = \sum_{(i,j)\in I}(r_{ij}- {\mathbf {u}_i}^Tm_j)^2 + \lambda(\sum_i n_{u_i}||\mathbf m_j||^2), \label{5}</script><p>&emsp;&emsp;在上式中$n_{u_i}$和$n_{m_j}$分别表示用户$i$d给出的评级数目和电影$j$得到的评级数目。让$I_j$表示用户$i$对电影集合$j$的评级。让$n_{u_i}$表示$I_j$的基数。相似的，对电影$j$评级的用户集合用$I_j$来表示。并且$I_j$的基数是$n_{u_i}$。这就相当于$\Gamma_U = diag(n_(u_i))$和$\Gamma_M = diag(n_(m_j))$的Tikhonov正则化。</p>
+<p>&emsp;&emsp;现在我们将演示如何在$M$给定的情况下得到矩阵$U$。$U$的列数（$u_i$）是在已知用户$i$的评级和用户$i$评级过的电影特征向量关系下解决正则化的线性最小二乘问题时给定的。</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+&\frac{1}{2}\frac{\partial f}{\partial u_{ki}} = 0,\ \ \forall i,k \\
+\Rightarrow &\sum_{j \in I_i}({\mathbf u_i}^T \mathbf m_j - r_{ij})m_{kj} + \lambda n_{u_i}u_{k_i} = 0, \ \ \forall i,k \\
+\Rightarrow &\sum_{j \in I_i}m_{kj}{\mathbf m_j}^T \mathbf u_i + \lambda n_{u_i}u_{k_i} = \sum_{j \in I_i}m_{kj}r_{ij},\, \ \ \forall i,k \\
+\Rightarrow &(M_{I_i}{M_{I_i}}^T + \lambda n_{u_i} E)\mathbf u_i = M_{I_i} R^T(i,I_i),\ \ \forall i\\
+\Rightarrow &\mathbf u_i = {A_i}^{-1}V_i,\ \ \forall i
+\end{aligned}  \label{6}</script><p>&emsp;&emsp;$A_i = M_{I_i}{M_{I_i}}^T + \lambda n_{u_i}E,V_i = M_{I_i}R^T(i,I_i)$，然后$E$是$n_f \times n_f$的方阵。$M_{I_i}$为$M$中列数为$I_i$中元素组成的一个子矩阵。$R(i,I_i)$是第$i$行中列数为$I_i$中元素组成的一个行向量。</p>
+<p>&emsp;&emsp;相似的，当$M$更新的时候，我们能通过正则化线性最小二乘法和对电影$j$进行评级用户的特征向量以及他们的评级计算出$m_j$的中元素。公式如下：</p>
+<script type="math/tex; mode=display">
+\mathbf m_j = {A_j}^{-1} V_j,\ \  \forall j, \label{7}</script><p>&emsp;&emsp;$A_j = U_{I_j}{U_{I_j}}^T + \lambda n_{m_j}E,V_j = U_{I_j}R^T(I_j,j)$。其中$U_{I_j}$表示$U$中列数为$I_j$中元素组成的子矩阵。并且$R(I_j,j)$是第$j$列中行数为$I_j$中元素组成的一个列向量。</p>
+<h2 id="加权为-lambda-正则化的并行ALS方法-Parallel-ALS-with-Weighted-lambda-Regularization"><a href="#加权为-lambda-正则化的并行ALS方法-Parallel-ALS-with-Weighted-lambda-Regularization" class="headerlink" title="加权为$\lambda$正则化的并行ALS方法(Parallel ALS with Weighted-$\lambda$-Regularization)"></a>加权为$\lambda$正则化的并行ALS方法(Parallel ALS with Weighted-$\lambda$-Regularization)</h2><p>&emsp;&emsp;我们通过并行更新$U$和$M$来并行计算ALS，我们使用的是最新版本的Matlab，该版本的Matlab允许在分离的Matlab上进行并行计算并互相通信(如分布式数据库)，这些分开的Matlab拥有自己的空间和硬件环境。每个这样的Matlab被称为一个单独的实验室，所以我们就会通过识别码labindex）和一个静态变量（numlabs）得知当前共有多少个labs。这些矩阵可以是私有（拥有自己的一个拷贝并且值都是不同的）的，也可以是复制过来的（私有但是所有的labs的值都是相同的）或是分布式（只有一个矩阵但在所有的labs当中是分区存储的）的。分布式的矩阵是存储和使用大容量数据集的简单方式，因为数据集过大的话，在一个存储器上存储是非常耗内存的。在我们的问题上，我们会使用评分矩阵R的拷贝作为分布式来存储，一份只存储行（例如只有用户）另一份只存储列（只有电影）。我们将会计算分布式的值并更新$U$和$M$，在计算$U$时我们会使用一份$M$的拷贝，反之亦然。因此，我们的labs互相通信去制造第一次计算在各个labs里的$U$和$M$的副本。Matlab的“gather”函数能提供我们所需要的lab的内部通信功能。</p>
+<p>&emsp;&emsp;为了更新$M$，我们需要$U$的一份每个lab的本地拷贝，我们会使用电影的评分数据来修改。这是由相同数量的电影分配的。存储电影$j$评级的lab自然地会用来更新$M$的列值，也就是影片$j$的特征向量。每个lab并行地在对应的影片组中为所有的电影计算$m_j$值，这些值都会进行集中，保证每个节点的$M$矩阵相同。同理，要更新$U$，所有的用户会被分成相同数量的用户组，接下来每个lab用以行分开的评级来在对应用户组中更新用户向量。下面的Matlab代码片段实现了给定$U$情况下修改$M$的实现：</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">M</span> = <span class="title">updateM</span><span class="params">(lAcols, U)</span></span></div><div class="line"></div><div class="line">  lamI = lambda * <span class="built_in">eye</span>(Nf);</div><div class="line">  lM = <span class="built_in">zeros</span>(Nf,Nlm); lM = single(lM);</div><div class="line">  <span class="keyword">for</span> m = <span class="number">1</span>:Nlm</div><div class="line">    users = <span class="built_in">find</span>(lAcols(:,m));</div><div class="line">    Um = U(:, users);</div><div class="line">    vector = Um * full(lAcols(users, m));</div><div class="line">    matrix = Um * Um’ + locWtM(m) * lamI;</div><div class="line">    X = matrix \ vector;</div><div class="line">    lM(:, m) = X;</div><div class="line">  <span class="keyword">end</span></div><div class="line">  M = gather(darray(lM));</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;对于以上的Matlab代码，lAcols是一份$R$中列值的本地拷贝，locWtM是所有电影在分开的电影组中的$n_{m_j}$向量，Nlm表示在电影组中的电影数量。Nf和lambda对应着$n_f$和$\lambda$，它们是ALS-WR中唯一可变的参数。</p>
+<p>&emsp;&emsp;由于使用了分布式（不共享内存算法）方式，该方法的计算时间节省了5%。该算法实现了一个接近线性加速的功能：如果$n_f=100$,那么在使用一个处理器的情况下需要花费2.5小时来更新$U$和$M$，但如果有30个处理器那么只需要5分钟。在30个循环的条件下，计算100个隐藏因子需要2.5个小时。</p>
+<h1 id="Netflix-Prize问题的性能"><a href="#Netflix-Prize问题的性能" class="headerlink" title="Netflix Prize问题的性能"></a>Netflix Prize问题的性能</h1><p>&emsp;&emsp;将我们的实验在HP Proliant DL380 G4上的30个处理器集群上运行，所有的处理器是Xeon 2.8Hz并且每四个处理器分享6GB的内存。对于每个$n_f$值，我们将进行了10到25次的ALS-WF循环，如果在探测数据集上更新U和M时如果增加了少于1bps的RMSE分数时循环就会停止。最佳的λ值会在试验和错误的情况下产生，测试的RMSE集合是从Netflix Prize网站的子任务获得的，该测试分数的真正之对我们来说是未知的，为了创建模型和调整参数，我们将探测数据集从训练数据集中排除并将它用于测试。探测数据集是训练数据集的一个子集，是由Netflix提供的，它包含了2006年最新的1408395个评分，每个用户是随机分配并且最多只拥有9个评级。Netflix将测试数据集隐藏了，但是测试数据集的分布和探测数据集的分布式一样的。</p>
+<h2 id="后期处理"><a href="#后期处理" class="headerlink" title="后期处理"></a>后期处理</h2><p>&emsp;&emsp;为了对预测结果进行加工处理，我们首先将一个全局修正方法应用到每个预测方法上，给定预测值$P$，如果该$P$的平均值和测试数据集的均值不一样，我们将用户一个固定参数$\tau = meam(test) - mean(P)$来转换所有的预测值。这个全局修正方法可以很清晰得看出的确减小了RMSE值。另外一种方法是将不同的预测值线性德结合起来获得一个更好的预测值。例如，给定两个预测源$P_0$和$P_1$，我们可以获得预测源族$P_x = (1-x)P_0 + xP_1$,并且使用线性回归来找到RMSE($Px$)的最小点$x^*$。因此我们能获得一个至少会比$P_0$或$P_1$值要好的预测 $P_{x^*}$ </p>
+<h2 id="ALS的测试结果"><a href="#ALS的测试结果" class="headerlink" title="ALS的测试结果"></a>ALS的测试结果</h2><p>&emsp;&emsp;在测试当中最大的发现是ALS-WR从来不会发生数据过度拟合的情况，如果我们增加循环的次数或隐藏特征的数量。正如图1所示，对于给定的$n_f$和$\lambda$，每次循环都会提升探测数据及中的RMSE分数，并在循环20次之后该分数会趋于收敛。不同的$\lambda$值会得出不同的分数，并且通常情况下我们需要使用比较小的λ值来得到比较好的RMSE值。图2显示了根据固定的$\lambda$和不同数量的隐藏特征（$n_f$的范围是2到20）的效果，对于每次测试，ALS-WR会重复循环直到RMSE值提升幅度小于1bps为止。从该图我们可以看出RMSE值会随着$n_f$的增大而单调递减，即使这个递减幅度是渐渐变小的。</p>
+<p>&emsp;&emsp;接下来我们使用大的$n_f$来进行试验，对于使用简单的$\lambda$正则化（$\Gamma_u = \Gamma_m = E$）的ALS，我们获得的RMSE值是0.9184，对于使用权重为$\lambda$的正则化和$n_f$为50的ALS，获得的RMSE值为0.9114，如果$n_f$值为150，那么值为0.9066。如果$n_f$值为300并伴有全局校正，RMSE值为0.9017，如果$n_f$值为400并伴有全局校正，则RMSE=0.9006；如果$n_f = 500$并伴有全局偏移，则RMSE=0.9000。最终，当$n_f = 1000$时，RMSE=0.8985，在特征从400增加到500的过程中获得了6bps的提升，假设随着特征的增加结果是逐渐减小的（同比），从500增加到1000的过程中大约有5 + 4 + 3 + 2 + 1 = 15bps的提升。因此，似乎0.8985是使用用权重为$\lambda$的正则化的ALS能够获得极限值了。0.8985这个RMSE分数比Netflix自身的CineMatch算法有了5.56%的性能提升，并且它是我们所知道的的单一方法解决此问题的最高得分之一了。</p>
+<h2 id="与其他方法进行线性混合"><a href="#与其他方法进行线性混合" class="headerlink" title="与其他方法进行线性混合"></a>与其他方法进行线性混合</h2><p>&emsp;&emsp;在这一节中，我们实现了其他的两种流行的协同过滤技术的并行版本。在各种情况下，相较单处理器版本的加速是大致用一个为$n$的因子$n$个处理器的集群。</p>
+<p>&emsp;&emsp;受限波尔兹曼机(Restricted Boltzman machine(RBM))是一种同时存在可见状态和隐藏状态的神经网络，它的无向边连接这每个可见状态和隐藏状态，而在可见状态之间和隐藏状态之间是没有连接的。因此得名受限。该方法先前被证明在Netflix竞赛中工作的很好[20]，我们也用Matlab实现了RBM，并将它转化为了PMODE。对于一个有100个隐藏单元组成的模型，在没有PMODE的情况下RBM花费了将近1小时的时间来完成一个循环，然后使用30个labs的PMODE只花费了3分钟就能进行一个循环。</p>
+<p>&emsp;&emsp;K-近邻算法(kNN)也是一种受欢迎的预测算法。定义一个恰当的距离矩阵，对于每个需要预测的数据点，用它的最近的$k$个点的加权平均数的评级来预测该点的评级。由于有许多的用户-用户对需要在合理的时间和空间内计算，我们会采用一个简化的方法，就像只有电影-电影一样。我们将用户分成用户组来实现并行$k$NN算法，这样一个lab就只处理一组用户了。</p>
+<p>&emsp;&emsp;对于RBM自己，得到的分数是0.9181，对于kNN，采用$k=21$和一个优秀的相似方法，得到的RMSE为0.9270。把ALS和RBM和ALS进行线性混合，得到的RMSE是0.8952（ALS+$k$NN+RBM），比Netflix自身的CineMatch推荐系统提升了5.9%。</p>
+<h1 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h1><p>&emsp;&emsp;现在有许多的学者和产业在研究推荐系统，低秩矩阵近似和Netflix prize问题。在下面我们会简要地介绍和我们紧密相关的工作。</p>
+<h2 id="推荐系统"><a href="#推荐系统" class="headerlink" title="推荐系统"></a>推荐系统</h2><p>&emsp;&emsp;推荐系统可以主要分为基于内容和系统过滤两类，并且在学术和产业中已经有了很不错的研究结果[<a href="#16">16</a>,<a href="#2">2</a>,<a href="#7">7</a>]。基于内容的推荐系统是分析一个项的内容（如文本，元数据和特征）以确定相关项，典范有InfoFinder[<a href="#12">12</a>],NewsWeeder[<a href="#14">14</a>]。协同过滤用大量用户的行为或者品味集群来猜测特定用户的相关项，GroupLens[<a href="#19">19</a>]和Bellcore Video Recimmender[<a href="#11">11</a>]可作为典范。包括实验室系统[<a href="#3">3</a>]和统一概率框架[18](#18)]对结合基于内容接近和协同过滤两者进行努力。</p>
+<h2 id="Netflix-Prize方案"><a href="#Netflix-Prize方案" class="headerlink" title="Netflix Prize方案"></a>Netflix Prize方案</h2><p>&emsp;&emsp;对于Netflix Prize，Salakhutdinov等人[<a href="#20">20</a>]使用受限波尔兹曼机（RBM）获得了略低于0.91的RMSE分数，他们也提出了采用梯度下降的低秩近似值方案，这种方案在20-60个隐藏特征值的情况下获得的RMSE分数略高于0.91。他们的SVD方法和我们的ALS-WR两者中的目标函数是一样的，但是我们使用的是交替最小二乘法并不是梯度下降来解决优化问题，并且我们可以使用一个很大的特征数（1000 vs 40）来获得RMSE分数的明显提升。</p>
+<p>&emsp;&emsp;在众多的Netflix问题的解决方案中，Bell等人[<a href="#5">5</a>]结合kNN和低秩近似提出了一种基于邻居的方案，并获得比使用单独一种方式更好的结果。他们的团队由于在排位赛的数据集中，得到0.8712分，这个分数比CineMatch高出8.5%,在2007年10月获得了进步奖。然而他们的解决方案[<a href="#4">4</a>]是将ALS,RBM和kNN衍生出来的107种独立解决方案进行线性组合。在单独使用ALS的情况下，他们的最好得分是采用128个隐藏特征的时候，所获得的RMSE分数高于0.9000。对于Netflix prize的各种解决方案的综合性处理，可以看出现在KDD Cup &amp; Worshop 2007的个别的论文[<a href="#21">21</a>,<a href="#17">17</a>,<a href="#15">15</a>,<a href="#13">13</a>,<a href="#23">23</a>]。</p>
+<h2 id="低阶近似"><a href="#低阶近似" class="headerlink" title="低阶近似"></a>低阶近似</h2><p>&emsp;&emsp;可以使用奇异值分解的变体来用低阶矩阵来逼近一个特定的矩阵，例如在信息检索中（SVD方法被认为是潜在语义索引[<a href="#9">9</a>]）。其他的矩阵分解方法如非负矩阵分解和最大边矩阵分解也都在Netflix Prize[<a href="#23">23</a>]中有所应用。</p>
+<p>&emsp;&emsp;对于一些指定的矩阵，SVD就不适用了，为了将元素和低阶矩阵中所对应的元素之间的平方和的不同最小化，ALS被证明是一种有效地方式，它不像SVD,提供了非正交因子。SVD会每次下计算一列，而对于一些特定的情况，并没有这样的递归算法。使用ALS的好处是它可以很容易实现并行化，像Lanczos一样，对于稀疏且特定的矩阵，ALS保留了已知的矩阵元素的稀疏结构，并且它的存储效率是很高的。</p>
+<h1 id="结束语"><a href="#结束语" class="headerlink" title="结束语"></a>结束语</h1><p>&emsp;&emsp;对于Netflix Prize的情况下的大规模协同过滤。我们介绍了一种简单的并行算法。这种算法就和在文献中所提到的任何一种单一方法的效果是一样的好。该算法对于大数据集具有很好的可扩展性，通过使用RBM和kNN或者其他复杂的混合模式可以适当地获得更好的分数。特别地ALS-WR能够在没有日期和电影名称的情况下获得很好的结果，对于模型建立和参数调整，通过并行得到的很快的运行时间让它具有很好的竞争力，研究一个理论来解释为什么ALS-WR从不会过度拟合你的数据将会是一件很有趣的事情。</p>
+<p>&emsp;&emsp;由于当今世界已经进入互联网计算和网络应用的时代，大型数据的计算变得无处不在。传统的单机单线程计算已经变得不可行,出现了计算模型转移的典型范式。并行和/或分布式计算对于任何计算环境来说已经成为一个必不可少的组件了。Google公司，这个互联网的先行者，正在建设有它们自己的并行/分布式计算的基础设施，基于MapReduce[<a href="#8">8</a>],Google File System[<a href="#6">10</a>],Bigtable[<a href="#6">6</a>]等。大多数的技术型公司并没有资本和相关技术来建立自己的并行分布式计算设施，它们反而更愿意使用可行的解决方案来解决这些问题。Hadoop[<a href="#1">1</a>]是一个由Yahoo!赞助的开源项目，它致力于使用开源方式来复制Google的计算基础设施。我们发现并行Matlab是灵活和有效的，并对于程序来说是很简单的。因此，从我们的经验来看，它看起来对于普遍的，易扩展的并行/分布计算时一个有力的候选人。</p>
+<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><p><a name="1"><br>[1]The Hadoop Project. <a href="http://lucene.apache.org/hadoop/" target="_blank" rel="external">http://lucene.apache.org/hadoop/</a>.</a></p>
+<p><a name="2"><br>[2]Netflix CineMatch. <a href="http://www.netflix.com" target="_blank" rel="external">http://www.netflix.com</a>.</a></p>
+<p><a name="3"><br>[3]M. Balabanovi and Y. Shoham. Fab: content-based, collaborative recommendation. <em>Communications of the ACM</em>, 40(3):66–72, 1997.</a></p>
+<p><a name="4"><br>[4]R. Bell, Y. Koren, and C. Volinsky. Modeling relationships at multiple scales to improve accuracy of large recommender systems. In P. Berkhin, R. Caruana, and X. Wu, editors,<em>KDD</em>, pages 95–104. ACM, 2007.</a></p>
+<p><a name="5"><br>[5]F. Chang et al. Bigtable: A distributed storage system for structured data. <em>In Proc. of OSDI’06: 7th Symposium on Operating Systems Design and Implementation</em>, pages 205–218, Seattle, WA, USA, November 6-8 2006.</a></p>
+<p><a name="6"><br>[6]A. Das, M. Datar, A. Garg, and S. Rajaram. Google news personalization: Scal- able online collaborative filtering. <em>In Proc. of WWW’07: the 16th International Conference on World Wide Web</em>, pages 271–280, Banff, Alberta, Canada, 2007.</a></p>
+<p><a name="7"><br>[7]J. Dean and S. Ghemawat. Mapreduce: Simplified data processing on large clusters. In Proc of OSDI’04: <em>Sixth Symposium on Operating System Design and Implemen- tation</em>, pages 137–150, San Francisco, CA, December 2004.</a></p>
+<p><a name="8"><br>[8]S. Deerwester, S. T. Dumais, G. W. Furnas, T. K. Landauer, and R. Harshman. Indexing by latent semantic analysis. <em>Journal of the American Society for Infor- mation Science</em>, 41(6):391–407, 1999.</a></p>
+<p><a name="9"><br>[9]S. Ghemawat, H. Gobioff, and S.-T. Leung. The Google File System. <em>In Proc. of SOSP’03: 19th ACM Symposium on Operating Systems Principles</em>, pages 29–43, Lake George, NY, October 2003.</a></p>
+<p><a name="10"><br>[10]W. Hill, L. Stead, M. Rosenstein, and G. Furnas. Recommending and evaluating choices in a virtual community of use. <em>In Proc. of CHI’95: Conference on Human Factors in Computing Systems</em>, Denver, May 1995.</a></p>
+<p><a name="11"><br>[11]B. Krulwich and C. Burkey. Learning user information interests through extrac- tion of semantically significant phrases. <em>In Proc the AAAI Spring Symposium on Machine Learning in Information Access</em>, Stanford, CA, March 1996.</a></p>
+<p><a name="12"><br>[12]M. Kurucz, A. A. Benczur, and K. Csalogany. Methods for large scale svd with missing values. <em>In Proc of KDD Cup and Workshop</em>, 2007.</a></p>
+<p><a name="13"><br>[13]K. Lang. NewsWeeder: Learning to filter netnews. <em>In Proc. the 12th International Conference on Machine Learning</em>, Tahoe City, CA, 1995.</a></p>
+<p><a name="14"><br>[14]Y. J. Lim and Y.W. Teh. Variational bayesian approach to movie rating prediction. <em>In Proc of KDD Cup and Workshop</em>, 2007.</a></p>
+<p><a name="15"><br>[15]G. Linden, B. Smith, and J. York. Amazon.com recommendations: <em>Item-to-item collaborative filtering. IEEE Internet Computing</em>, 7:76–80, 2003.</a></p>
+<p><a name="16"><br>[16]A. Paterek. Improving regularized singular value decomposition for collaborative filtering. <em>In Proc of KDD Cup and Workshop</em>, 2007.</a></p>
+<p><a name="17"><br>[17]A. Popescul, L. Ungar, D. Pennock, and S. Lawrence. Probabilistic models for unified collaborative and content-based recommendation in sp. <em>In Proceedings of the 17th Annual Conference on Uncertainty in Artificial Intelligence (UAI-01)</em>, pages 437–44, San Francisco, CA, 2001. Morgan Kaufmann.</a></p>
+<p><a name="18"><br>[18]P. Resnick, N. Iacovou, M. Suchak, P. Bergstrom, and J. Riedl. GroupLens: an open architecture for collaborative filtering of netnews. <em>In Proc. the ACM Conference on Computer-Supported Cooperative Work</em>, Chapel Hill, NC, 1994.</a></p>
+<p><a name="19"><br>[19]R. Salakhutdinov, A. Mnih, and G. E. Hinton. Restricted boltzmann machines for collaborative filtering. In Z. Ghahramani, editor, <em>ICML, volume 227 of ACM International Conference Proceeding Series</em>, pages 791–798. ACM, 2007.</a></p>
+<p><a name="20"><br>[20]G. Takacs, I. Pilaszy, B. Nemeth, and D. Tikk. On the gravity recommendation system. <em>In Proc of KDD Cup and Workshop</em>, 2007.</a></p>
+<p><a name="21"><br>[21]A. N. Tikhonov and V. Y. Arsenin. <em>Solutions of Ill-posed Problems</em>. John Wiley, New York, 1977.</a></p>
+<p><a name="22"><br>[22]M. Wu. Collaborative filtering via ensembles of matrix factorizations. <em>In Proc of KDD Cup and Workshop</em>, 2007.</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/算法/" rel="tag"># 算法</a>
+          
+            <a href="/tags/机器学习/" rel="tag"># 机器学习</a>
+          
+            <a href="/tags/推荐系统/" rel="tag"># 推荐系统</a>
+          
+            <a href="/tags/大数据/" rel="tag"># 大数据</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/15/初探ISP对网络接入费用的定价策略/" rel="next" title="初探ISP对网络接入费用的定价策略">
+                <i class="fa fa-chevron-left"></i> 初探ISP对网络接入费用的定价策略
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/02/对双调欧几里得旅行商问题的一些思考/" rel="prev" title="对双调欧几里得旅行商问题的一些思考">
+                对双调欧几里得旅行商问题的一些思考 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="djjowfy" />
+          <p class="site-author-name" itemprop="name">djjowfy</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Links
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://www.rapospectre.com/" title="RaPoSpectre" target="_blank">RaPoSpectre</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://shadowwood.me" title="ShadowWood" target="_blank">ShadowWood</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://ziriwong.cc/" title="ZiriWong" target="_blank">ZiriWong</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lumiaxu.com/" title="Lumia Xu" target="_blank">Lumia Xu</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://vkwk.space/" title="Viking Warlock" target="_blank">Viking Warlock</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://toxni.com/" title="Toxni" target="_blank">Toxni</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#摘要"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#引言"><span class="nav-number">2.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#问题公式化"><span class="nav-number">3.</span> <span class="nav-text">问题公式化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#我们的方案"><span class="nav-number">4.</span> <span class="nav-text">我们的方案</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#加权正则化交替最小二乘法（ALS-with-Weight-lambda-Regularization）"><span class="nav-number">4.1.</span> <span class="nav-text">加权正则化交替最小二乘法（ALS with Weight-$\lambda$-Regularization）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#加权为-lambda-正则化的并行ALS方法-Parallel-ALS-with-Weighted-lambda-Regularization"><span class="nav-number">4.2.</span> <span class="nav-text">加权为$\lambda$正则化的并行ALS方法(Parallel ALS with Weighted-$\lambda$-Regularization)</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Netflix-Prize问题的性能"><span class="nav-number">5.</span> <span class="nav-text">Netflix Prize问题的性能</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#后期处理"><span class="nav-number">5.1.</span> <span class="nav-text">后期处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ALS的测试结果"><span class="nav-number">5.2.</span> <span class="nav-text">ALS的测试结果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#与其他方法进行线性混合"><span class="nav-number">5.3.</span> <span class="nav-text">与其他方法进行线性混合</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#相关工作"><span class="nav-number">6.</span> <span class="nav-text">相关工作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#推荐系统"><span class="nav-number">6.1.</span> <span class="nav-text">推荐系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Netflix-Prize方案"><span class="nav-number">6.2.</span> <span class="nav-text">Netflix Prize方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#低阶近似"><span class="nav-number">6.3.</span> <span class="nav-text">低阶近似</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结束语"><span class="nav-number">7.</span> <span class="nav-text">结束语</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考文献"><span class="nav-number">8.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">djjowfy</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://djjowfy.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2016/12/25/大规模并行协同过滤算法/';
+          this.page.identifier = '2016/12/25/大规模并行协同过滤算法/';
+          this.page.title = '大规模并行协同过滤算法';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://djjowfy.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("pekgUTl1Fh2Mub6DgpTGudPi-gzGzoHsz", "6VjRvGEJvzOnuLafhOj7A01o");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+          inlineMath: [ ['$', '$'] ],
+          displayMath: [ ['$$', '$$']],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        messageStyle: "none",
+        "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

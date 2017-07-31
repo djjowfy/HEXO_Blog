@@ -1,0 +1,1125 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="ISP,定价策略,网络,接入费用," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.png?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="引言&amp;emsp;&amp;emsp;对于网络接入费用，现今存在着两种比较普遍的收费模式，一种是统一费率（也就是所谓的包月制，每月$g$元，不限时间和流量）。一种是基于使用量，一般表现为基本费用加步进费用（也就是熟悉的手机上网套餐，每月固定$g$元，可以得到$q_0$的流量或者是时间，超出$q_0$的每个单位收费$p$元，比如若按流量收费就每$MB$需要$p$元）。
+&amp;emsp;&amp;emsp;因此本文将会对这">
+<meta property="og:type" content="article">
+<meta property="og:title" content="初探ISP对网络接入费用的定价策略">
+<meta property="og:url" content="http://yoursite.com/2016/12/15/初探ISP对网络接入费用的定价策略/index.html">
+<meta property="og:site_name" content="djjowfy">
+<meta property="og:description" content="引言&amp;emsp;&amp;emsp;对于网络接入费用，现今存在着两种比较普遍的收费模式，一种是统一费率（也就是所谓的包月制，每月$g$元，不限时间和流量）。一种是基于使用量，一般表现为基本费用加步进费用（也就是熟悉的手机上网套餐，每月固定$g$元，可以得到$q_0$的流量或者是时间，超出$q_0$的每个单位收费$p$元，比如若按流量收费就每$MB$需要$p$元）。
+&amp;emsp;&amp;emsp;因此本文将会对这">
+<meta property="og:image" content="http://yoursite.com/images/需求曲线示例.png">
+<meta property="og:image" content="http://yoursite.com/images/消费者剩余示例.png">
+<meta property="og:image" content="http://yoursite.com/images/需求曲线.png">
+<meta property="og:image" content="http://yoursite.com/images/统一费率下的消费者剩余.png">
+<meta property="og:image" content="http://yoursite.com/images/步进费率下的消费者剩余.png">
+<meta property="og:image" content="http://yoursite.com/images/无限资源情况下采用步进费率所造成的无谓损失.png">
+<meta property="og:image" content="http://yoursite.com/images/有限资源情况下采用统一费率所需的额外资源.png">
+<meta property="og:image" content="http://yoursite.com/images/有限资源情况下采用统一费率所得到的社会福利.png">
+<meta property="og:image" content="http://yoursite.com/images/有限资源情况下采用统一费率所造成的浪费.png">
+<meta property="og:image" content="http://yoursite.com/images/有限资源情况下采用统一费率时各类用户所造成的浪费.png">
+<meta property="og:image" content="http://yoursite.com/images/有限资源情况下采用统一费率所造成的交叉补贴.png">
+<meta property="og:image" content="http://yoursite.com/images/有限资源情况下采用统一费率时轻度用户在不同服务下的情况.png">
+<meta property="og:updated_time" content="2017-01-13T05:57:04.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="初探ISP对网络接入费用的定价策略">
+<meta name="twitter:description" content="引言&amp;emsp;&amp;emsp;对于网络接入费用，现今存在着两种比较普遍的收费模式，一种是统一费率（也就是所谓的包月制，每月$g$元，不限时间和流量）。一种是基于使用量，一般表现为基本费用加步进费用（也就是熟悉的手机上网套餐，每月固定$g$元，可以得到$q_0$的流量或者是时间，超出$q_0$的每个单位收费$p$元，比如若按流量收费就每$MB$需要$p$元）。
+&amp;emsp;&amp;emsp;因此本文将会对这">
+<meta name="twitter:image" content="http://yoursite.com/images/需求曲线示例.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/12/15/初探ISP对网络接入费用的定价策略/"/>
+
+
+
+
+
+  <title>初探ISP对网络接入费用的定价策略 | djjowfy</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?9d159d45332b341a4f20f312239b79f4";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">djjowfy</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/15/初探ISP对网络接入费用的定价策略/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="djjowfy">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="djjowfy">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">初探ISP对网络接入费用的定价策略</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-12-15T12:00:00+08:00">
+                2016-12-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/原创/" itemprop="url" rel="index">
+                    <span itemprop="name">原创</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/原创/杂/" itemprop="url" rel="index">
+                    <span itemprop="name">杂</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/12/15/初探ISP对网络接入费用的定价策略/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2016/12/15/初探ISP对网络接入费用的定价策略/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2016/12/15/初探ISP对网络接入费用的定价策略/" class="leancloud_visitors" data-flag-title="初探ISP对网络接入费用的定价策略">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>&emsp;&emsp;对于网络接入费用，现今存在着两种比较普遍的收费模式，一种是统一费率（也就是所谓的包月制，每月$g$元，不限时间和流量）。一种是基于使用量，一般表现为基本费用加步进费用（也就是熟悉的手机上网套餐，每月固定$g$元，可以得到$q_0$的流量或者是时间，超出$q_0$的每个单位收费$p$元，比如若按流量收费就每$MB$需要$p$元）。</p>
+<p>&emsp;&emsp;因此本文将会对这两种网络接入收费模式进行分析讨论，比较他们两个的特征，并且站在社会福利的角度说明它们对网络资源的浪费，然后阐明基于使用量进行收费的优势不在于收费系统本身而是在于网络资源的不足。也就是说在社会福利的角度上来说，如果通信技术的发展能提供无限的的网络资源，那么还是统一费率优势大。后面也站在其他角度，对它们两者进行了比较分析。最后对步进费率的步进长度的选择给出一定的理由。<br><a id="more"></a></p>
+<h1 id="背景知识"><a href="#背景知识" class="headerlink" title="背景知识"></a>背景知识</h1><p>&emsp;&emsp;本节是叙述本文中所用到的经济学知识，以后部分对该类知识将不再复述。</p>
+<h2 id="机会成本"><a href="#机会成本" class="headerlink" title="机会成本"></a>机会成本</h2><h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><p>&emsp;&emsp;<strong>机会成本</strong>（Opportunity Cost, OC）是指决策过程中面临多项选择，当中被放弃而价值最高的选择（highest-valued option foregone），又称为“替代性成本 (alternative cost)”，就是俗语的“世上没有免费午餐”、鱼与熊掌不可兼得。</p>
+<h3 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h3><p>&emsp;&emsp;机会成本又称为择一成本、替代性成本。机会成本对商业公司来说，可以是利用一定的时间或资源生产一种商品时，而失去的利用这些资源生产其他最佳替代品的机会就是机会成本。</p>
+<p>&emsp;&emsp;而机会成本泛指一切在作出选择后其中一个最大的损失,机会成本会随付出的代价改变而作出改变,例如被舍弃掉的选项之喜爱程度或价值作出改变时,而得到之价值是不会令机会成本改变的。</p>
+<p>&emsp;&emsp;而如果在选择中放弃选择最高价值的选项(首选),那么其机会成本将会是首选。而作出选择时,应该要选择最高价值的选项(机会成本最低的选项),而放弃选择机会成本最高的选项,即失去越少越明智。</p>
+<p>&emsp;&emsp;例如某甲现在有1小时时间，可挑选A、B、C三件同样都需要花费1小时才能完成的三件事之一来做，他若选择了A，就得放弃做B、C二事的机会；若选择了B，就得放弃做A、C两事的机会。又如在选择了某项社会福利（如创业津贴）后，受到固定资源的限制，他便得失去选择其他福利（如选择国民住宅）的机会──则放弃选择国民住宅福利的机会，即为选择创业津贴福利的“机会成本”</p>
+<h2 id="边际成本"><a href="#边际成本" class="headerlink" title="边际成本"></a>边际成本</h2><h3 id="定义-1"><a href="#定义-1" class="headerlink" title="定义"></a>定义</h3><p>&emsp;&emsp;在经济学和金融学中，<strong>边际成本</strong>指的是每一单位新增生产的产品（或者购买的产品）带来的总成本的增量。</p>
+<h3 id="计算公式"><a href="#计算公式" class="headerlink" title="计算公式"></a>计算公式</h3><script type="math/tex; mode=display">
+MC = \frac{\Delta TC}{\Delta Q}</script><h3 id="解析-1"><a href="#解析-1" class="headerlink" title="解析"></a>解析</h3><p>&emsp;&emsp;这个概念表明每一单位的产品的成本与总产品量有关。比如，仅生产一辆汽车的成本是极其巨大的，而生产第101辆汽车的成本就低得多，而生产第10000汽车的成本就更低了（这是因为规模经济）。</p>
+<p>&emsp;&emsp;但是，考虑到机会成本，随着生产量的增加，边际成本可能会增加。还是这个例子，生产新的一辆汽车时，所用的材料可能有更好的用处，所以要尽量用最少的材料生产出最多的车，这样才能提高边际收益。
+　　</p>
+<h2 id="效用"><a href="#效用" class="headerlink" title="效用"></a>效用</h2><h3 id="定义-2"><a href="#定义-2" class="headerlink" title="定义"></a>定义</h3><p>&emsp;&emsp;<strong>效用</strong>是指对于消费者通过消费或者享受闲暇等使自己的需求、欲望等得到的满足的一个度量。</p>
+<p>&emsp;&emsp;在微观经济学中，<strong>边际效用</strong>（英语：<strong>marginal utility</strong>），又译为边际效应，是指每新增（或减少）一个单位的商品或服务，它对商品或服务的收益增加（或减少）的效用。</p>
+<h3 id="相关原理"><a href="#相关原理" class="headerlink" title="相关原理"></a>相关原理</h3><p>&emsp;&emsp;关于效用，有两条著名原理：</p>
+<ul>
+<li><p>边际效用递减原理：一个人对于财富的占有多多益善，即效用函数一阶导数大于零；随着财富的增加，满足程度的增加速度不断下降，效用函数二阶导数小于零。比如一个人饥饿的时候，吃第一个面包的效用是很大的。以后，随着这个人所吃的面包数量的连续增加，虽然总效用是不断增加的，但每增加一个面包给他带来的效用增量即边际效用却是递减的。当他完全吃饱的时候，面包的总效用达到最大值，而边际效用却降为零。如果他还继续吃面包，就会感到不舒服，这意味着面包的边际效用进一步降为负值，总效用也开始下降。</p>
+</li>
+<li><p>最大效用原理：在风险和不确定条件下，个人的决策行为准则是为了获得最大期望效用值而非最大期望金额值。</p>
+</li>
+</ul>
+<h2 id="需求曲线"><a href="#需求曲线" class="headerlink" title="需求曲线"></a>需求曲线</h2><h3 id="定义-3"><a href="#定义-3" class="headerlink" title="定义"></a>定义</h3><p>&emsp;&emsp;<strong>需求曲线</strong>是显示在特定时间内，某物品的价格与需求量关系的曲线，反映了需求表两个向量的线性关系。</p>
+<h3 id="解析-2"><a href="#解析-2" class="headerlink" title="解析"></a>解析</h3><p>&emsp;&emsp;按照上面所说的边际效用递减定律，假设其他条件不变，物品的边际效用会随着享有的数量增加而递减，于是效用曲线为负斜率。按照相关经济学理论，物品带给消费者使用的是其效用。消费者愿为边际效用付出的代价称之为边际需求价格，物品数量为边际购买量，因此（个人的）边际效用曲线演化成（个人的）需求曲线。（个人的）需求曲线便是（个人的）效用曲线的推导结果，反映人们愿意付出多少价格去获取不同数量的物品，或者说反映人们愿意付出多少价格去获取每一新增的物品所带给他的效用。</p>
+<p>&emsp;&emsp;所以说$P$并不是代表市场上该物品的价格，而是消费者愿意为其付的价格。因此需求曲线上的一点$(Q_0,P_0)$表示在买第$Q_0$个物品时，消费者愿意付$P_0$的价格，而<strong>不是</strong>当价格为$P_0$时，消费者愿意买$Q_0$个物品！！！</p>
+<img src="/images/需求曲线示例.png" title="需求曲线示例">
+<h2 id="消费者剩余"><a href="#消费者剩余" class="headerlink" title="消费者剩余"></a>消费者剩余</h2><h3 id="定义-4"><a href="#定义-4" class="headerlink" title="定义"></a>定义</h3><p>&emsp;&emsp;<strong>消费者剩余（consumer surplus）</strong>又称为消费者的净收益，是指买者的支付意愿减去买者的实际支付量。消费者剩余衡量了买者自己感觉到所获得的额外利益。简单地说，就是买者卖者都希望从市场活动中获得收益。</p>
+<h4 id="计算公式-1"><a href="#计算公式-1" class="headerlink" title="计算公式"></a>计算公式</h4><p>&emsp;&emsp;消费者剩余的计算公式<br>　<script type="math/tex">消费者剩余＝买者的愿意支付的价格－买者的实际支付</script></p>
+<h3 id="图示"><a href="#图示" class="headerlink" title="图示"></a>图示</h3><p>&emsp;&emsp;消费者总剩余就是消费者剩余之和，可以用需求曲线下方的阴影面积表示，如消费者购买的商品时所获得的消费者总剩余为图中的灰色面积。</p>
+<img src="/images/消费者剩余示例.png" title="消费者剩余示例">
+<h3 id="解析-3"><a href="#解析-3" class="headerlink" title="解析"></a>解析</h3><p>&emsp;&emsp;我们还是继续用面包来做例子。一个面包所标的价格是$2$美金，而饥肠辘辘的小明愿意为第一个面包付$10$美金，那么这时候消费者剩余就是$8$美金。第二个面包只愿意付$6$美金，第三个面包只愿意付$3$美金，第四个面包就只愿意付$2$美金了。那么总消费者剩余就是$10+6+3+2-2\times4= 13$美金。</p>
+<h2 id="无谓损失"><a href="#无谓损失" class="headerlink" title="无谓损失"></a>无谓损失</h2><h3 id="定义-5"><a href="#定义-5" class="headerlink" title="定义"></a>定义</h3><p>&emsp;&emsp;<strong>无谓损失</strong>又为社会净损失,也被称为死三角(Deadweight loss)，是指由于市场未处于最优运行状态而引起的社会成本, 也就是当偏离竞争均衡时, 所损失的消费者剩余和生产者剩余。</p>
+<h3 id="解析-4"><a href="#解析-4" class="headerlink" title="解析"></a>解析</h3><p>&emsp;&emsp;社会净损失是由于垄断、关税、配额、税收或其他扭曲等因素引起的生产者和消费者都得不到的那部分，使资源得不到最佳限度的分配。例如，当垄断企业抬高价格时，消费者将减少消费，这样将导致减少的数量中本来可以实现的消费者剩余都流向了社会，这种社会性损失，就是我们所说的社会净损失。</p>
+<h2 id="需求的价格弹性"><a href="#需求的价格弹性" class="headerlink" title="需求的价格弹性"></a>需求的价格弹性</h2><h3 id="定义-6"><a href="#定义-6" class="headerlink" title="定义"></a>定义</h3><p>&emsp;&emsp;<strong>需求的价格弹性</strong>指某种商品需求量变化的百分率与价格变化的百分率之比，它用来测度商品需求量变动对于商品自身价格变动反应的敏感性程度。</p>
+<h3 id="计算公式-2"><a href="#计算公式-2" class="headerlink" title="计算公式"></a>计算公式</h3><ul>
+<li>需求弧弹性表示需求曲线上两点之间的弹性，其计算公式为：</li>
+</ul>
+<script type="math/tex; mode=display">
+E_d = - \frac {\frac{\Delta Q_d}{Q_d}}{\frac{\Delta P}{P}} = - \frac{\Delta Q_d}{\Delta P} \bullet \frac{P}{Q_d}</script><ul>
+<li>平均弹性，其计算公式为：</li>
+</ul>
+<script type="math/tex; mode=display">
+E_d = \frac{Q_2 - Q_1}{P_2-P_1} \bullet \frac{P_1 + P_2}{Q_1 + Q_2}</script><ul>
+<li>点弹性表示的是需求曲线上某一点的弹性，其计算公式为：</li>
+</ul>
+<script type="math/tex; mode=display">
+E_d = - \frac{d Q}{d P} \bullet \frac{P}{Q}</script><h3 id="需求弹性的种类"><a href="#需求弹性的种类" class="headerlink" title="需求弹性的种类"></a>需求弹性的种类</h3><ol>
+<li>若$Ed =0$，则称为该物品的需求为完全无弹性。</li>
+<li>若$0 \lt Ed \lt 1$，则称该物品的需求为相当缺乏弹性。如多数生活必需品。</li>
+<li>若$Ed = 1$，则称该物品的需求为单位弹性。此时需求量的相对变化幅度与价格的相对变化幅度相等。</li>
+<li>若$1 \lt Ed \lt \infty $，则称该物品的需求为相当富有弹性。大多数是奢侈品的需求。</li>
+<li>若$Ed= \infty$，则称该物品的需求为完全有弹性。</li>
+</ol>
+<h1 id="上网接入费用的经济学模型"><a href="#上网接入费用的经济学模型" class="headerlink" title="上网接入费用的经济学模型"></a>上网接入费用的经济学模型</h1><h2 id="粗略模型"><a href="#粗略模型" class="headerlink" title="粗略模型"></a>粗略模型</h2><p>&emsp;&emsp;现在复述一下引言中所做的假设。假设上网费是按每个服务单位$p$价格来收的。如果按照流量收费，那么这个服务单位就是流量单位（比如1MB），如果是按照上网时间来进行收费，那么这个服务单位就是时间单位（比如1小时）。OK，那假设固定费用（不管该月上网与否，都要收的钱）为$g$，那么效用函数就是$U = v(q) + y$.那这时候负载的计算公式就是$p(q - q_0)+g = m$。为了方便分析，可以把$q_0$省略。于是，现在的负载就为$pq+g = m$。因此，最大化消费者效用就变成以下的最优化问题。</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+Max \ \ U(q,v) &= v(q) + y \\\\
+s.t. \ \ pq + g &= m 
+\end{aligned}</script><p>&emsp;&emsp;上述最优化问题求导，一阶导为零</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+ \frac{\Delta v(q)}{\Delta q} - p &= 0 \\\\
+  \frac{\Delta v(q)}{\Delta q}  &= p 
+  \end{aligned}</script><p>&emsp;&emsp;上式中$ \frac{\Delta v(q)}{\Delta q}  = p $称为效用函数最大化条件。那么该条件的反函数设为$D(p)$,于是$D(p)$就可以当做需求函数。为了方便，可以设需求函数为一次函数，于是可画需求曲线如下：</p>
+<img src="/images/需求曲线.png" width="500" height="300" title="图一 需求曲线">
+<h2 id="统一费率模式"><a href="#统一费率模式" class="headerlink" title="统一费率模式"></a>统一费率模式</h2><p>&emsp;&emsp;在统一费率模式下，当边际效用为0时，使用量为$q_f$,而总消费者剩余就是从总效用中排除$P_f$。因此可用下式进行表达</p>
+<script type="math/tex; mode=display">
+CS_{flat\ rate} = \int^{q_f}_0 D(q)dq - P_f</script><p>&emsp;&emsp;这时可画消费者剩余如下图中蓝色阴影部分所示，设黄色部分的面积为$P_f$。</p>
+<img src="/images/统一费率下的消费者剩余.png" width="500" height="300" title="图二 统一费率下的消费者剩余">
+<h2 id="步进费率模式"><a href="#步进费率模式" class="headerlink" title="步进费率模式"></a>步进费率模式</h2><p>&emsp;&emsp;当ISP采用步进费率费用模式进行收费时，边际效用为零的点，就是$D(q) = p_u$的点，设该点的横坐标为$q_u$。为了方便和统一费率模式进行比较，假设$p_uq_u = P_f$。也就是说两者最终的收费一样。于是可用下式来表示总消费者剩余。</p>
+<script type="math/tex; mode=display">
+CS_{Usage-based} = \int^{q_u}_0 D(q)dq - p_uq_u</script><p>&emsp;&emsp;这时候，可画消费者剩余如下图中蓝色阴影部分所示</p>
+<img src="/images/步进费率下的消费者剩余.png" width="500" height="300" title="图三 步进费率下的消费者剩余">
+<h1 id="统一费率模式-VS-步进费率模式"><a href="#统一费率模式-VS-步进费率模式" class="headerlink" title="统一费率模式 VS 步进费率模式"></a>统一费率模式 VS 步进费率模式</h1><h2 id="社会福利角度分析"><a href="#社会福利角度分析" class="headerlink" title="社会福利角度分析"></a>社会福利角度分析</h2><h3 id="网络资源无限的情况"><a href="#网络资源无限的情况" class="headerlink" title="网络资源无限的情况"></a>网络资源无限的情况</h3><p>&emsp;&emsp;当网络资源无限时，ISP的边际成本为0。因此，最大化消费者剩余时产生的边际费用为0，因为ISP不用转嫁或者说强加边际成本给消费者。为了最大化消费者剩余，将扩展消费直到该消费者的边际效用为零。事实上，当ISP对接入费用收费采用统一费率模式时，就相当于把边际费用视为零。</p>
+<p>&emsp;&emsp;对比图二和图三，可以清晰地看出统一费率模式下的消费者总剩余比步进费率模式下的大。那么，因为边际费用为零，所以可以计算无谓损失如下：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+无谓损失 &= CS_{Flat} - CS_{Usage-based} \\\\
+&= (\int^{q_f}_0 D(q)dq - P_f) - (\int^{q_u}_0 D(q)dq - p_uq_u) \\\\
+&= \int^{q_f}_0 D(q)dq - \int^{q_u}_0 D(q)dq \ \ \ \ \ \ (∵ P_f = p_uq_u)
+\end{aligned}</script><p>&emsp;&emsp;这时候，可画无畏损失如下图中蓝色阴影部分所示</p>
+<img src="/images/无限资源情况下采用步进费率所造成的无谓损失.png" width="500" height="300" title="图四 无限资源情况下采用步进费率所造成的无谓损失">
+<p>&emsp;&emsp;减小的效用和造成的消费者剩余的损失是一样大的，就是图中阴影部分的面积。那么站在社会福利的角度来说，因为步进费率模式会造成无畏损失，所以统一费率模式比步进费率模式要优越。换句话来说，当提供的网络资源无限的时候，从统一费率模式改为步进费率模式会使社会福利收缩。</p>
+<h3 id="网络资源有限的情况"><a href="#网络资源有限的情况" class="headerlink" title="网络资源有限的情况"></a>网络资源有限的情况</h3><p>&emsp;&emsp;当网络资源有限时，ISP增加服务的边际成本不为零。可在统一费率模式和步进费率模式下的总消费者剩余还是和网络资源无限的情况是一样的。</p>
+<p>&emsp;&emsp;所以从个体视角上，统一费率模式所得到的消费者剩余还是大于步进费率模式所得到的消费者剩余。</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+CS_{Flat} - CS_{Usage-based} &= (\int^{q_f}_0 D(q)dq - P_f) - (\int^{q_u}_0 D(q)dq - p_uq_u) \\\\
+&= \int^{q_f}_0 D(q)dq - \int^{q_u}_0 D(q)dq \ \ \ \ \ \ (∵ P_f = p_uq_u) \\\\
+&= \int^{q_f}_{q_u} D(q)dq \ \ \gt \ \  0
+\end{aligned}</script><p>&emsp;&emsp; 然而，在统一费率模式下，消费者在取得最大效用时，比步进费率模式需要多消耗$(q_f -q_u)$个服务单位。然而，在边际成本不为零的情况下，ISP需要多付出的资源为$p_u(q_f - q_u) = 2 \int^{q_f}_{q_u} D(q)dp$。这时可用下图来表示</p>
+<img src="/images/有限资源情况下采用统一费率所需的额外资源.png" width="500" height="300" title="图五 有限资源情况下采用统一费率所需的额外资源">
+<p>&emsp;&emsp;那现在还是从社会福利的角度来看，会发现事情正在起变化。虽然消费者个体的消费者剩余在统一费率模式的情况下多于步进费率模式。但要清晰得看到，从社会福利的视角来说，统一费率模式的情况比步进费率模式的情况消耗的资源要多。所以为了量化，就用个体获得的总效用减去服务费用和所需资源得到全社会的福利。就如下式一样</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+SW_{Flat} &= CS_{Flat} - Required resources \\\\
+&=(\int^{q_f}_0 D(q)dq - P_f) - 2\int^{q_f}_{q_u} D(q)dq \\\\
+&= \int^{q_u}_0 D(q)dq - P_f - \int^{q_f}_{q_u} D(q)dq  \\\\
+&\lt  \int^{q_u}_0 D(q)dq - p_uq_u = CS_{Usage-based} \ \ \ \ (∵ P_f = p_uq_u,\int^{q_f}_{q_u} D(q)dq \gt 0   )
+\end{aligned}</script><p>&emsp;&emsp;可用下图的蓝色部分表示当资源有限时，考虑到所需的资源，采用统一费率模式的福利水平。因此，当网络资源有限的时候，采用步进费率模式比采用统一费率模式所能获得的社会福利高。</p>
+<img src="/images/有限资源情况下采用统一费率所得到的社会福利.png" width="500" height="300" title="图六 有限资源情况下采用统一费率所得到的社会福利">
+<h2 id="浪费"><a href="#浪费" class="headerlink" title="浪费"></a>浪费</h2><h3 id="引入"><a href="#引入" class="headerlink" title="引入"></a>引入</h3><p>&emsp;&emsp;当资源有限，也就是边际费用不为零的时候，根据上面的分析，当采用步进费率模式的时候，所用的用量就是$q_u$。如果采用统一费率模式，所用的用量就是$q_f$。因为统一费率下，边际费用是零，所以可用下图中的红色部分表示统一费率下的浪费。</p>
+<img src="/images/有限资源情况下采用统一费率所造成的浪费.png" width="500" height="300" title="图七 有限资源情况下采用统一费率所造成的浪费">
+<p>&emsp;&emsp;也可以清晰地看出，如果$p_u$越大，浪费越严重。</p>
+<h3 id="分类分析"><a href="#分类分析" class="headerlink" title="分类分析"></a>分类分析</h3><p>&emsp;&emsp;如果我们用需求曲线$\alpha D(p)$对用户进行分类。可以分为三类：当$\alpha$ 为1时，称为普通用户；当$\alpha \gt 1$时，称为重度用户；当$0 \lt \alpha \lt 1$时称为轻度用户。这三类用户可用下图表示。</p>
+<img src="/images/有限资源情况下采用统一费率时各类用户所造成的浪费.png" width="500" height="300" title="图八 有限资源情况下采用统一费率时各类用户所造成的浪费">
+<p>&emsp;&emsp;在上图中轻度用户，普通用户，重度用户的浪费分别用绿色，粉色，黄色表示，可见重度用户的浪费是最多的。也就是说$\alpha$越大，浪费越严重。 </p>
+<h3 id="价格弹性"><a href="#价格弹性" class="headerlink" title="价格弹性"></a>价格弹性</h3><p>&emsp;&emsp;正如背景知识所介绍的，价格弹性可用$\frac{p}{D(p)} \times | \frac{ \partial D}{\partial p} |$来表示。所以当价格弹性升高时，需求函数会越来越平缓，这就意味着阴影部分的面积越来越大，浪费更加严重。</p>
+<h2 id="交叉补贴"><a href="#交叉补贴" class="headerlink" title="交叉补贴"></a>交叉补贴</h2><p>&emsp;&emsp;如下图所示，假设ISP按照普通用户的使用量进行定价，也就是说$P_f = P_u \times q_f(普通用户)$ 。那么这也就意味着轻度用户对重度用户进行了补贴。因为消费者剩余是$\int^{q_f}_0 D(q) -  P_f$。这也就意味着极其轻度用户，也就是$q_f$比较小的用户，很可能消费者剩余为负值，而这会造成这部分用户的损失。然后这部分损失会倒逼ISP降价（但会发生亏损）或者设定一个用量上限。</p>
+<p>&emsp;&emsp;而如果采用步进费率模式，按照前面分析的，用量会降低，而且每类用户基本不对其他类用户产生补贴，这样极其轻度用户也会进行消费。</p>
+<img src="/images/有限资源情况下采用统一费率所造成的交叉补贴.png" width="500" height="300" title="图九 有限资源情况下采用统一费率所造成的交叉补贴">
+<h2 id="网络服务升级"><a href="#网络服务升级" class="headerlink" title="网络服务升级"></a>网络服务升级</h2><p>&emsp;&emsp;在某国，网络服务不能强制升级，只能通过市场淘汰。假设，现在存在两种网络，一种低端，一种先进。当采用统一费率模式的时候，先进的网络相比低端的要贵一些。对于轻度用户来说，发生的情况可以用下图进行表示。矩形表示所收的费用。</p>
+<img src="/images/有限资源情况下采用统一费率时轻度用户在不同服务下的情况.png" width="500" height="300" title="图十 有限资源情况下采用统一费率时轻度用户在不同服务下的情况">
+<p>&emsp;&emsp;很容易可以得到，在先进的网络下，消费者剩余小于在低端网络上的消费者剩余。所以这时候，轻度用户就会停留在低端网络中。</p>
+<h2 id="公地悲剧"><a href="#公地悲剧" class="headerlink" title="公地悲剧"></a>公地悲剧</h2><p>&emsp;&emsp;1968年英国加勒特·哈丁教授(Garrett Hardin)在《The tragedy of the commons》一文说，作为理性人，每个牧羊者都希望自己的收益最大化。在公共草地上，每增加一只羊会有两种结果：一是获得增加一只羊的收入；二是加重草地的负担，并有可能使草地过度放牧。因为损失是大家共担但利润是他个人独享的，所以牧羊者经过思考决定不顾草地的承受能力而增加羊群数量。于是他便会因羊只的增加而收益增多。看到有利可图。许多牧羊者也纷纷加入这一行列。由于羊群的进入不受限制，所以牧场被过度使用，草地状况迅速恶化，悲剧就这样发生了。</p>
+<p>&emsp;&emsp;上述例子表明，公地作为一项资源或财产有许多拥有者，他们中的每一个都有使用权，但没有权利阻止其他人使用，从而造成资源过度使用和枯竭。在统一费率模式也是这样的，因为过度使用网络造成的损失是大家共担的。所以就会有重度用户用P2P等占有带宽，很容易引起了整个网络的拥塞。而若采用步进费率模式，用得越多所需缴费也就越多。这样就有力地减少了这种行为，也就减少了网络的拥塞程度。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>&emsp;&emsp;根据上述讨论可以得到，在边际费用不为零的情况下，步进费率模式优于统一费率模式，但为啥在现实生活中还会有出现统一费率模式呢？一般来说，有以下几点原因</p>
+<ul>
+<li>费率是可预期的，这样能大大减小消费者的危险感或者说不确定性。对于ISP来说，也减小了投资的危险感。</li>
+<li>统一费率模式能迅速地提升消费者对于服务的需求，培养消费习惯，也能使ISP迅速地占领市场。</li>
+<li>统一费率模式避免了步进费率模式所需要的搜集消费信息进行操作和核算消费。它实在是一个很简单的方法。</li>
+<li>当边际费用为零并且ISP没有负载压力的时候，统一费率模式使消费者的满足感最大。</li>
+</ul>
+<p>&emsp;&emsp;所以当智能手机出现后，消费者对流量的需求越来越大，导致了无线网络的负载越来越大，边际费用再也不能忽视，而且也使无线网络拥挤不堪，而且网速也越来越快。于是ISP对无线网络采取了步进费率模式。</p>
+<h1 id="对步进费率模式步进长度的探究"><a href="#对步进费率模式步进长度的探究" class="headerlink" title="对步进费率模式步进长度的探究"></a>对步进费率模式步进长度的探究</h1><p>&emsp;&emsp;如图三所示，当$p_u$下降时，$q_u$是增加的。那么ISP的收入$p_uq_u$也是增加的。从这里可以看出$p_u$，也就是步进长度越小越好。<br>&emsp;&emsp;然而，边际成本并不是零，而且有基建成本，运营成本等。并且ISP还需要抢占市场。所以为了不亏损，步进长度需要一定的大小。<br>&emsp;&emsp;因此需要权衡这两者，毕竟利润等于收入和成本只差，最后来确定步进长度的大小。</p>
+<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><ul>
+<li><a href="https://books.google.com/books?hl=zh-CN&amp;lr=&amp;id=PQZGJnKH4KwC&amp;oi=fnd&amp;pg=PR11&amp;dq=internet+pricing&amp;ots=Gkj5J18mdx&amp;sig=cNkxkyXM90t2ImZZNQU8yiP8Dp0#v=onepage&amp;q&amp;f=false" target="_blank" rel="external">McKnight L W, Bailey J P. Internet economics[M]. Mit Press, 1998.</a></li>
+<li><a href="http://userpage.fu-berlin.de/~jmueller/its/conf/amsterdam06/downloads/papers/Lee%20(123" target="_blank" rel="external">Lee J H. Comparison of Broadband Internet Pricing System: flat rate tariff vs. usage-based tariff[J].</a>.pdf)</li>
+<li><a href="http://people.ischool.berkeley.edu/~hal/index-project/networkpaper.pdf" target="_blank" rel="external">Edell R, Varaiya P. Providing Internet access: What we learn from INDEX[J]. IEEE network, 1999, 13(5): 18-25.</a></li>
+<li><a href="http://scenic.princeton.edu/network20q/" target="_blank" rel="external">Networked Life: 20 Questions and Answers</a></li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ISP/" rel="tag"># ISP</a>
+          
+            <a href="/tags/定价策略/" rel="tag"># 定价策略</a>
+          
+            <a href="/tags/网络/" rel="tag"># 网络</a>
+          
+            <a href="/tags/接入费用/" rel="tag"># 接入费用</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/11/13/PageRank初探/" rel="next" title="PageRank初探">
+                <i class="fa fa-chevron-left"></i> PageRank初探
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/25/大规模并行协同过滤算法/" rel="prev" title="大规模并行协同过滤算法">
+                大规模并行协同过滤算法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="djjowfy" />
+          <p class="site-author-name" itemprop="name">djjowfy</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Links
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://www.rapospectre.com/" title="RaPoSpectre" target="_blank">RaPoSpectre</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://shadowwood.me" title="ShadowWood" target="_blank">ShadowWood</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://ziriwong.cc/" title="ZiriWong" target="_blank">ZiriWong</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lumiaxu.com/" title="Lumia Xu" target="_blank">Lumia Xu</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://vkwk.space/" title="Viking Warlock" target="_blank">Viking Warlock</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://toxni.com/" title="Toxni" target="_blank">Toxni</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#引言"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#背景知识"><span class="nav-number">2.</span> <span class="nav-text">背景知识</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#机会成本"><span class="nav-number">2.1.</span> <span class="nav-text">机会成本</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#定义"><span class="nav-number">2.1.1.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解析"><span class="nav-number">2.1.2.</span> <span class="nav-text">解析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#边际成本"><span class="nav-number">2.2.</span> <span class="nav-text">边际成本</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#定义-1"><span class="nav-number">2.2.1.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#计算公式"><span class="nav-number">2.2.2.</span> <span class="nav-text">计算公式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解析-1"><span class="nav-number">2.2.3.</span> <span class="nav-text">解析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#效用"><span class="nav-number">2.3.</span> <span class="nav-text">效用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#定义-2"><span class="nav-number">2.3.1.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相关原理"><span class="nav-number">2.3.2.</span> <span class="nav-text">相关原理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#需求曲线"><span class="nav-number">2.4.</span> <span class="nav-text">需求曲线</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#定义-3"><span class="nav-number">2.4.1.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解析-2"><span class="nav-number">2.4.2.</span> <span class="nav-text">解析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消费者剩余"><span class="nav-number">2.5.</span> <span class="nav-text">消费者剩余</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#定义-4"><span class="nav-number">2.5.1.</span> <span class="nav-text">定义</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#计算公式-1"><span class="nav-number">2.5.1.1.</span> <span class="nav-text">计算公式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#图示"><span class="nav-number">2.5.2.</span> <span class="nav-text">图示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解析-3"><span class="nav-number">2.5.3.</span> <span class="nav-text">解析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#无谓损失"><span class="nav-number">2.6.</span> <span class="nav-text">无谓损失</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#定义-5"><span class="nav-number">2.6.1.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解析-4"><span class="nav-number">2.6.2.</span> <span class="nav-text">解析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#需求的价格弹性"><span class="nav-number">2.7.</span> <span class="nav-text">需求的价格弹性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#定义-6"><span class="nav-number">2.7.1.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#计算公式-2"><span class="nav-number">2.7.2.</span> <span class="nav-text">计算公式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#需求弹性的种类"><span class="nav-number">2.7.3.</span> <span class="nav-text">需求弹性的种类</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#上网接入费用的经济学模型"><span class="nav-number">3.</span> <span class="nav-text">上网接入费用的经济学模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#粗略模型"><span class="nav-number">3.1.</span> <span class="nav-text">粗略模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#统一费率模式"><span class="nav-number">3.2.</span> <span class="nav-text">统一费率模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#步进费率模式"><span class="nav-number">3.3.</span> <span class="nav-text">步进费率模式</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#统一费率模式-VS-步进费率模式"><span class="nav-number">4.</span> <span class="nav-text">统一费率模式 VS 步进费率模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#社会福利角度分析"><span class="nav-number">4.1.</span> <span class="nav-text">社会福利角度分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#网络资源无限的情况"><span class="nav-number">4.1.1.</span> <span class="nav-text">网络资源无限的情况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#网络资源有限的情况"><span class="nav-number">4.1.2.</span> <span class="nav-text">网络资源有限的情况</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#浪费"><span class="nav-number">4.2.</span> <span class="nav-text">浪费</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#引入"><span class="nav-number">4.2.1.</span> <span class="nav-text">引入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分类分析"><span class="nav-number">4.2.2.</span> <span class="nav-text">分类分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#价格弹性"><span class="nav-number">4.2.3.</span> <span class="nav-text">价格弹性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#交叉补贴"><span class="nav-number">4.3.</span> <span class="nav-text">交叉补贴</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网络服务升级"><span class="nav-number">4.4.</span> <span class="nav-text">网络服务升级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#公地悲剧"><span class="nav-number">4.5.</span> <span class="nav-text">公地悲剧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">4.6.</span> <span class="nav-text">小结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#对步进费率模式步进长度的探究"><span class="nav-number">5.</span> <span class="nav-text">对步进费率模式步进长度的探究</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考文献"><span class="nav-number">6.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">djjowfy</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://djjowfy.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2016/12/15/初探ISP对网络接入费用的定价策略/';
+          this.page.identifier = '2016/12/15/初探ISP对网络接入费用的定价策略/';
+          this.page.title = '初探ISP对网络接入费用的定价策略';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://djjowfy.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("pekgUTl1Fh2Mub6DgpTGudPi-gzGzoHsz", "6VjRvGEJvzOnuLafhOj7A01o");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+          inlineMath: [ ['$', '$'] ],
+          displayMath: [ ['$$', '$$']],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        messageStyle: "none",
+        "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

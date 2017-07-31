@@ -1,0 +1,1178 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="PageRank,算法,网页排序," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.png?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="搜索引擎架构&amp;emsp;&amp;emsp;在进入PageRank之前，我们先看一下一个典型的搜索引擎架构是长啥样的。下图是98年google创始人拉里●佩奇提出的原始的google的架构。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PageRank初探">
+<meta property="og:url" content="http://yoursite.com/2016/11/13/PageRank初探/index.html">
+<meta property="og:site_name" content="djjowfy">
+<meta property="og:description" content="搜索引擎架构&amp;emsp;&amp;emsp;在进入PageRank之前，我们先看一下一个典型的搜索引擎架构是长啥样的。下图是98年google创始人拉里●佩奇提出的原始的google的架构。">
+<meta property="og:image" content="http://yoursite.com/images/搜索引擎架构.png">
+<meta property="og:image" content="http://yoursite.com/images/中美关系搜索结果.png">
+<meta property="og:image" content="http://yoursite.com/images/简单网络拓扑.png">
+<meta property="og:image" content="http://yoursite.com/images/孤岛拓扑.png">
+<meta property="og:image" content="http://yoursite.com/images/去孤岛拓扑.png">
+<meta property="og:image" content="http://yoursite.com/images/去孤岛B拓扑.png">
+<meta property="og:image" content="http://yoursite.com/images/自环网络拓扑.png">
+<meta property="og:image" content="http://yoursite.com/images/隔离网络.png">
+<meta property="og:updated_time" content="2017-01-12T09:08:23.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PageRank初探">
+<meta name="twitter:description" content="搜索引擎架构&amp;emsp;&amp;emsp;在进入PageRank之前，我们先看一下一个典型的搜索引擎架构是长啥样的。下图是98年google创始人拉里●佩奇提出的原始的google的架构。">
+<meta name="twitter:image" content="http://yoursite.com/images/搜索引擎架构.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/11/13/PageRank初探/"/>
+
+
+
+
+
+  <title>PageRank初探 | djjowfy</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?9d159d45332b341a4f20f312239b79f4";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">djjowfy</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/11/13/PageRank初探/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="djjowfy">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="djjowfy">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">PageRank初探</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-11-13T12:00:00+08:00">
+                2016-11-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/原创/" itemprop="url" rel="index">
+                    <span itemprop="name">原创</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/原创/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/11/13/PageRank初探/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2016/11/13/PageRank初探/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2016/11/13/PageRank初探/" class="leancloud_visitors" data-flag-title="PageRank初探">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="搜索引擎架构"><a href="#搜索引擎架构" class="headerlink" title="搜索引擎架构"></a>搜索引擎架构</h1><p>&emsp;&emsp;在进入PageRank之前，我们先看一下一个典型的搜索引擎架构是长啥样的。下图是98年google创始人拉里●佩奇提出的原始的google的架构。</p>
+<img src="/images/搜索引擎架构.png" width="400" height="400" title="典型搜索引擎架构">
+<a id="more"></a>
+<p>&emsp;&emsp;分布式的爬虫从URL Server得到URL列表，然后爬取或者说下载网页放到store server里面。接着store server压缩后，又把它送到Repository里。Indexer执行了一序列操作，从Repository读取数据，进行解压，并且进行解析，顺便把每个页面根据网址都编上索引，我们叫索引为docID。而且它为以后的网页的相关性和重要性排序进行了准备。对于相关性的准备，它把网页进行了分词操作，而且还记录了词出现的位置，大小写甚至字体大小等等一些参数，然后把他扔到Barrels里面。根据这些词生成更新字典，Lexicon。对于重要性的准备，它提取了该页面所有的链接和一些重要信息，比如链接是从哪儿链接到哪儿，链接对应的描述等，保存到anchor file里面，也就是上图的anchors。URLresolver所承当的工作比较简单，对anchor file里面的相对路径转换为绝对路径，并且根据链接建立哪个页面跟哪个页面链接的数据库，当然页面是用docID标示的。这个数据库就是后面用来计算PageRank的关键。这就是搜索引擎的大概的架构。</p>
+<h1 id="采用PageRank的原因"><a href="#采用PageRank的原因" class="headerlink" title="采用PageRank的原因"></a>采用PageRank的原因</h1><p>&emsp;&emsp;我们可以假设如果没有PageRank，会怎么样。<br>&emsp;&emsp;如果把<a href="#pic1">上图</a>的PageRank相关的模块都删除，那么那个seacher得到的结果中相关性的权重就会很大。比如把每个搜索的关键字11作为一个hit，然后对barrels里的东西进行匹配，匹配的程度越高，最后的显示结果的排名也就越高。<br>&emsp;&emsp;举个例子，比如现在我在google里搜索中美关系。如果Ａ网页出现了５次中美关系，Ｂ网页出现了两次中美关系，那么Ａ网页就应该排在Ｂ网页前面。咋眼一看，好像挺有道理的样子。可是我去搜索个东西，我希望的是对我越有用的排在越前面。可是如果有个Ｃ网页，它在一个div里面写了100次中美关系，那么这个网页是不是就会排的很靠前？？而且这个div还可以设置不可见。那么也就是说可能C网页其实是个卖六合彩，跟中美关系一点关系都没有。再者说就算没人做这些spam，但是中美关系重复多次的也不一定是我想要的，像这类的搜索，一般wiki才是最需要的。让我们看一下google的搜索结果。</p>
+<p><a name="pic1"><br><img src="/images/中美关系搜索结果.png" width="400" height="400" title="中美关系在google中的搜索结果"></a></p>
+<p>&emsp;&emsp;是不是觉得这个排序还不错的？BBC那个可能是它SEO做得特别好吧↖(^ω^)↗</p>
+<h1 id="PageRank介绍"><a href="#PageRank介绍" class="headerlink" title="PageRank介绍"></a>PageRank介绍</h1><p>&emsp;&emsp;从前面两节可以知道PageRank算法是个重要性排序，跟相关性的关系不大。那么它是怎么实现的呢？</p>
+<blockquote>
+<p>it makes use of the link structure of the Web to calculate a quality ranking for each web page. This ranking is called PageRank.</p>
+</blockquote>
+<p>&emsp;&emsp;这句话出自<a href="http://www.sciencedirect.com/science/article/pii/S1389128612003611" target="_blank" rel="external">The anatomy of a large-scale hypertextual web search engine</a>。也就是说PageRank是基于web的链接架构的，这也在我们前面典型搜索引擎架构图里体现。OK，那我们就把link structure of web画出来。假设每个网页作为一个节点。从网页A到网页B的链接用从A到B的有向边来进行表示。我们先考虑一个仅仅四个网页的一个简单网络，那么拓扑图如下图所示。</p>
+<p><a name="“pic2”/"><br><img src="/images/简单网络拓扑.png" width="500" height="300" title="简单网络拓扑"></a></p>
+<p>&emsp;&emsp;PageRank是算网页的quality，那么假设用每个节点的权重来表示quality，于是上图的每个节点的权重又应该怎么进行计算呢？<br>&emsp;&emsp;既然PageRank仅仅跟链接相关，那么就从链接出发。显而易见，链接一共可以分为两种：</p>
+<ul>
+<li>出去的链接，也就是从本网页链接到其他网页的链接。</li>
+<li>进入的链接，也就是从其他网页链接到本网页的链接。</li>
+</ul>
+<p>&emsp;&emsp;假设我是网页A的站长，那么我能管理的就是网页A到其他网页的链接。所以出去的链接不应该对网页A的权重造成影响，否则站长就能轻易地控制它了。而我并不能控制其他网页，那么如果存在其他网页对网页A的链接，那么就说明网页A对该网页是有用的，不然就不会存在这么一个引用。所以网页的权重应该是和进入的链接紧密相关。<br>&emsp;&emsp;由<a href="#pic2">上图</a>所示，网页D对网页Ａ有个链接。一般而言网页D不是我能控制。如果它能链接我的网页，就说明我的网页比较重要，至少有用。并且如果网页D越重要，那么我的网页就越重要。<br>&emsp;&emsp;这就比如，我认识习近平，李长春等等人，这不代表我很重要，全国人民只要看新闻就能认识他们。但是如果李长春认识我，那我的身价就不低，如果习近平认识我，那更加不得了了。<br>&emsp;&emsp;那么如何量化它呢？佩奇就提出了一个很简单的办法。假设网页Ｄ的权重为PR(D),由<a href="#pic2">图</a>可知，网页D有三条出去的链接那么每条链接的权重就是PR(D)/3。以此类推，如果把这图看成状态转移图，那么当它平衡的时候，每个点的权重就是最终每个页面的质量或者说权重。此时：</p>
+<blockquote>
+<p>PR(A) = PR(D)/3<br>PR(B) = PR(D)/3<br>PR(C) = PR(A) + PR(B) + PR(D)/3<br>PR(D) = PR(C) </p>
+</blockquote>
+<p>&emsp;&emsp;假设总权重为1，那么就可以得到PR(A)=PR(B)=0.125,PR(C)=PR(D)=0.375。</p>
+<h1 id="利用矩阵计算PageRank"><a href="#利用矩阵计算PageRank" class="headerlink" title="利用矩阵计算PageRank"></a>利用矩阵计算PageRank</h1><p>&emsp;&emsp;上一节对PageRank算法作了简单的说明，但上一节的方法明显不适合计算机进行计算。所以这一节对利用矩阵进行PageRank计算进行简单的描述。<br>&emsp;&emsp;如果把<a href="#pic2">上图</a>看成一个状态转移图，A、B、C、D用1、2、3、4来进行表示，那么就可以得到转移矩阵如下，假设第i行第j列表示从网页i到网页j的链接的权重，那么网页i有$N$条出去的链接，该值就为$1 \over N$。如果从网页i到网页j的链接，那么该值就为0</p>
+<script type="math/tex; mode=display">
+H = 
+\left[
+    \begin{matrix}
+        0 & 0 & 1 & 0 \\\\
+        0 & 0 & 1 & 0  \\\\
+        0 & 0 & 0 & 1  \\\\
+        1 \over 3 & 1 \over 3 & 1 \over 3 & 0  \\\\
+     \end{matrix}
+ \right] \label{Matrix1}</script><p>&emsp;&emsp;现在转移矩阵已经有了，那么初始矩阵呢？？我们目的是对网页进行排序，那么也就是说只要相对权重就行。于是初始矩阵就可以随便设，反正最后经过状态转移矩阵的平衡，最后都会平衡的。于是就设初始矩阵为全一矩阵如下，第i列代表网页i。</p>
+<script type="math/tex; mode=display">
+W = 
+\left[
+    \begin{matrix}
+        1 & 1 & 1 & 1 
+     \end{matrix}
+ \right] \label{Matrix2}</script><p>&emsp;&emsp;若设$W^*$为$W$的下一状态，那么可得如下公式</p>
+<script type="math/tex; mode=display">
+W^* = W \times H \tag{1} \label{eq1}</script><p>&emsp;&emsp;如果原先拓扑不变态的话，一直乘下去，最后$W$会收敛，也就是说最终会$W^*=W$。那么公式$\eqref{eq1}$可以写为</p>
+<script type="math/tex; mode=display">
+PR = PR \times H \\\\
+PR \times PR^T = 1 (opt) \tag{2} \label{eq2}</script><p>&emsp;&emsp;在上式中$PR$代表最终每个页面的权重,是个四维行向量。然后这个行向量的模为1是个可选条件，仅仅是为了方便排序而已，其实为多少都无所谓。具体来说：</p>
+<script type="math/tex; mode=display">
+\left[
+    \begin{matrix}
+        PR_A & PR_B & PR_C & PR_D
+     \end{matrix}
+ \right] = \\\\
+ \left[
+    \begin{matrix}
+        PR_A & PR_B & PR_C & PR_D
+     \end{matrix}
+ \right] \times
+ \left[
+    \begin{matrix}
+        0 & 0 & 1 & 0 \\\\
+        0 & 0 & 1 & 0  \\\\
+        0 & 0 & 0 & 1  \\\\
+        1 \over 3 & 1 \over 3 & 1 \over 3 & 0  \\\\
+     \end{matrix}
+ \right] \tag{3} \label{eq3}</script><p>&emsp;&emsp;可以轻易地解出</p>
+<script type="math/tex; mode=display">
+\left[
+    \begin{matrix}
+        PR_A & PR_B & PR_C & PR_D
+     \end{matrix}
+ \right] = 
+ \left[
+    \begin{matrix}
+        0.125 & 0.125 & 0.375 & 0.375
+     \end{matrix}
+ \right]</script><p>&emsp;&emsp;这就是利用矩阵进行PageRank计算的方法。比较简单但也很有效。</p>
+<h1 id="PageRank对特殊拓扑的计算"><a href="#PageRank对特殊拓扑的计算" class="headerlink" title="PageRank对特殊拓扑的计算"></a>PageRank对特殊拓扑的计算</h1><p>&emsp;&emsp;前面对简单网络拓扑的PageRank计算进行了分析，但是其实如今的互联网上的网页拓扑应该是个稀疏矩阵，而且极为复杂，很容易出现各种奇葩情况。下面对可能出现的特殊情况进行分析</p>
+<h2 id="孤岛拓扑"><a href="#孤岛拓扑" class="headerlink" title="孤岛拓扑"></a>孤岛拓扑</h2><p>&emsp;&emsp;因为如今的互联网上的网页拓扑应该是个稀疏矩阵，很可能出现孤岛，也就是说某个网页只进不出，没有任何外链。这种情况就对PageRank算法提出了挑战。因为前面不断和转移矩阵相乘直到权重收敛，很大程度上是依赖转移矩阵的每一行的和为1，但是这种孤岛，或者说dead end的情况，所对应的行是全零的，这样就会导致了最后权重行向量不收敛。<br>&emsp;&emsp;我们这次把<a href="#pic2">上图</a>的C到D的链接改成了A到D的链接，破坏原先拓扑的强连通性，那么，如今网络拓扑如下：</p>
+<p><a name="pic3"><br><img src="/images/孤岛拓扑.png" width="500" height="300" title="孤岛网络拓扑"></a></p>
+<p>&emsp;&emsp;此时,可以很明显得看出节点C只进不出，是个dead end，这也导致了我们的拓扑不再是一个强连通拓扑。状态转移矩阵$H$根据<a href="#pic3">图</a>可以写为</p>
+<script type="math/tex; mode=display">
+\left[
+    \begin{matrix}
+        0 & 0 & 1 \over 2 & 1 \over 2 \\\\
+        0 & 0 & 1 & 0  \\\\
+        0 & 0 & 0 & 0  \\\\
+        1 \over 3 & 1 \over 3 & 1 \over 3 & 0  \\\\
+     \end{matrix}
+ \right]</script><p>&emsp;&emsp;如果直接用公式$\eqref{eq2}$进行计算，那么可以得到：</p>
+<script type="math/tex; mode=display">
+PR_A = PR_B = PR_C = PR_D = 0</script><p>&emsp;&emsp;这根本就不符合我们的预期。那么对解决孤岛问题，我们可以先拿掉孤岛，这样就回归我们上一节讨论的简单拓扑。比如我们把<a href="#pic3">图</a>中的节点C拿掉，可以得到拓扑如下：</p>
+<p><a name="pic4"><br><img src="/images/去孤岛拓扑.png" width="500" height="300" title="去孤岛C网络拓扑"></a></p>
+<p>&emsp;&emsp;此时,节点B又成孤岛，我们再去掉节点B。又得到新拓扑如下</p>
+<p><a name="pic5"><br><img src="/images/去孤岛B拓扑.png" width="500" height="200" title="去孤岛B网络拓扑"></a></p>
+<p>&emsp;&emsp;<a href="#pic5">上图</a>可以很明显地看出$ PR_A = PR_D $。假设总权重为1，那么$ PR_A = PR_D = \frac{1}{2} $。这时把$ PR_A = PR_D = \frac{1}{2} $代入<a href="#pic4">去孤岛C网络拓扑”</a>中，明显可以看到节点A和节点B近似对称，节点的权重应该一样。可以得到$ PR_B = \frac{1}{2} $ 。然后又继续恢复拓扑，把$PR_A  PR_B PR_D $的权重都代入<a href="#pic3">孤岛网络拓扑</a>我们就可以得到$ PR_C = \frac{11}{12}$。于是</p>
+<script type="math/tex; mode=display">
+\left[
+    \begin{matrix}
+        PR_A & PR_B & PR_C & PR_D
+     \end{matrix}
+ \right] = 
+ \left[
+    \begin{matrix}
+        1 \over 2 & 1 \over 2 & 11 \over 12 & 1 \over 2
+     \end{matrix}
+ \right]</script><p>&emsp;&emsp;但上面的这种方法有个很大的缺陷，需要分析拓扑的对称关系等，这就导致了计算机使用不是那么方便。那么有没有什么更方便的方法呢？<br>&emsp;&emsp;既然C点没有外链，那么我们就人为地给它“创造”外链。为了公平，有N个节点，那么就设节点到每个节点的概率为$1 \over N$。在<a href="#pic3">孤岛网络拓扑图</a>上就可以认为节点C到每个节点的概率都是$1 \over 4$。于是就能得到转移矩阵如下：</p>
+<script type="math/tex; mode=display">
+H = 
+\left[
+    \begin{matrix}
+        0 & 0 & 1 \over 2 & 1 \over 2 \\\\
+        0 & 0 & 1 & 0  \\\\
+        1 \over 4 & 1 \over 4 & 1 \over 4 & 1 \over 4  \\\\
+        1 \over 3 & 1 \over 3 & 1 \over 3 & 0  \\\\
+     \end{matrix}
+ \right]</script><p>&emsp;&emsp;然后采用公式$\eqref{eq2}$进行计算，可以得到</p>
+<script type="math/tex; mode=display">
+\left[
+    \begin{matrix}
+        PR_A & PR_B & PR_C & PR_D
+     \end{matrix}
+ \right] = 
+ \left[
+    \begin{matrix}
+        8 \over 45 & 8 \over 45 & 9 \over 4 & 1 \over 5
+     \end{matrix}
+ \right]</script><p>&emsp;&emsp;这个结果和前面的那个去节点的结果相比，比例以及相对大小极为相近。而且对于计算机来说，计算十分方便。</p>
+<h2 id="存在自环拓扑和孤立网络块拓扑"><a href="#存在自环拓扑和孤立网络块拓扑" class="headerlink" title="存在自环拓扑和孤立网络块拓扑"></a>存在自环拓扑和孤立网络块拓扑</h2><p>&emsp;&emsp;有时候会存在一个网页没有外链，只有指向自己的链接，比如好多博客都是这样的。没有参考文献，只有一句转载请注明XXXXX。这种拓扑我们用下图作为示例</p>
+<p><a name="pic6"><br><img src="/images/自环网络拓扑.png" width="500" height="300" title="有自环的网络拓扑"></a></p>
+<p>&emsp;&emsp;上图，就是把<a href="#pic3">孤岛拓扑</a>的节点C加了一个自己指向自己的链接，可以称为一个自环。那么这会出现什么情况呢？<br>&emsp;&emsp;我们先把状态转移矩阵$H$写出来。</p>
+<script type="math/tex; mode=display">
+H = 
+\left[
+    \begin{matrix}
+        0 & 0 & 1 \over 2 & 1 \over 2 \\\\
+        0 & 0 & 1 & 0  \\\\
+        0 & 0 & 1  & 0 \\\\
+        1 \over 3 & 1 \over 3 & 1 \over 3 & 0  \\\\
+     \end{matrix}
+ \right]</script><p>&emsp;&emsp;然后采用公式$\eqref{eq2}$进行计算，可以得到</p>
+<script type="math/tex; mode=display">
+\left[
+    \begin{matrix}
+        PR_A & PR_B & PR_C & PR_D
+     \end{matrix}
+ \right] = 
+ \left[
+    \begin{matrix}
+        0 & 0 & 1 & 0
+     \end{matrix}
+ \right]</script><p>&emsp;&emsp;也就是说节点$C$变成1了，而其他节点变成0。节点C最重要是符合我们预期的，但是其他节点都为0，就没法排序了，属于无效数据。<br>&emsp;&emsp;但前面我们假设节点$C$去每个节点的概率相等，但这个拓扑就没法这么假设，因为节点$C$有个指向自己的链接，那么按理来说就算会到处跳网页，自己转自己的网页的概率也会比去其他网页的概率高。但是高多少呢？？<br>&emsp;&emsp;现在我们再看一个拓扑。</p>
+<p><a name="pic7"><br><img src="/images/隔离网络.png" width="500" height="400" title="孤立网络块拓扑"></a></p>
+<p>&emsp;&emsp;在上图中$A、B$和$C、D$是不相连的。这在实际网络中极易出现这种情况。比如说伟大的GFW横跨中间。那么这时候如何判断独立的网络中的节点在整个互联网中的权重呢？？比如网络区域$\alpha$和$\beta$是两块不相连的网络。其中节点A是网络块$\alpha$中的权重最大的节点，节点B是网络块$\beta$中的权重最大的节点。那么这时候节点$A$和$B$哪个权重大？？<br>&emsp;&emsp;为了解决这类问题，就引入了一个“心灵转移概率”$\beta$。它表示有$\beta$的概率不走正常路，也就是说不是按照拓扑所给出的链接进行跳转，而是随机去任何一个网页。因为不是按照链接走的，所以称为“心灵转移概率”。这个值为经验值，一般为0.1到0.2.这样的话可写如下PageRank公式</p>
+<script type="math/tex; mode=display">
+W^* = (1 - \beta) \times W \times H + \beta \times \frac{\vec e}{N} \tag{4} \label{eq4}</script><p>&emsp;&emsp;上式中的$\vec e$就是一个全一的向量，维数等于页面的总个数$N$。<br>&emsp;&emsp;现在就用$\beta = 0.2$来计算<a href="#pic6">有自环的网络拓扑</a>，当权重向量的范数小于0.00001时，可以得到：</p>
+<script type="math/tex; mode=display">
+\left[
+    \begin{matrix}
+        PR_A & PR_B & PR_C & PR_D
+     \end{matrix}
+ \right] = 
+ \left[
+    \begin{matrix}
+      0.070896 & 0.070896 & 0.791184 & 0.078358
+     \end{matrix}
+ \right]</script><p>&emsp;&emsp;公式$ \eqref {eq4} $还可以算其他的拓扑，如计算<a href="#pic3">孤岛拓扑</a>。可得</p>
+<script type="math/tex; mode=display">
+\left[
+    \begin{matrix}
+        PR_A & PR_B & PR_C & PR_D
+     \end{matrix}
+ \right] = 
+ \left[
+    \begin{matrix}
+      0.071194 & 0.071194 & 0.157622 & 0.078809
+     \end{matrix}
+ \right]</script><p>&emsp;&emsp;可以看到，这个结果的顺序和前面我们的方法得到的结果是一致的，这也验证了正确性和合理性。</p>
+<h1 id="PageRank的缺陷"><a href="#PageRank的缺陷" class="headerlink" title="PageRank的缺陷"></a>PageRank的缺陷</h1><p>&emsp;&emsp;在工程上不存在完美的算法，每个算法总是有各种各样的缺陷。PageRank也是一样的。PageRank的大的缺点有三个：</p>
+<ul>
+<li><p>忽视了用户的话题偏好。比如说我是一个程序员，你搜苹果，如果你前面给我一堆苹果（水果）的网页，就不符合我的预期。所以就应该把网页按照话题进行分类。于是就在PageRank上做了改进，变成了Topic-Specific PageRank算法。</p>
+</li>
+<li><p>测量模型过于单一。这是它的优点方便计算，但是也是缺点，仅仅关注了链接。于是有许多新的权重算法，比如Hubs-and-Authorities</p>
+</li>
+<li><p>易受Link Spam 的攻击。Link Spam就是攻击者自己做了一堆站点，特定了这些站点的链接。让他能控制的站点（支持站点）给想要提高排名的站点（目标站点）链接。我们在前面的PageRank算法的分析中，可以得到，被链接的站点可以分享给它链接站点的权重，于是就通过这个来拉高排名。也可以大量投放推广链接到论坛，贴吧等地方制造链接。这也可以调高目标站点的排名。这是PageRank最大的缺陷，于是google已经基本放弃了继续维护PageRank算法，而是采用它的改进型——TrustRank算法。</p>
+</li>
+</ul>
+<h1 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h1><h2 id="PageRank的参考算法（Java）"><a href="#PageRank的参考算法（Java）" class="headerlink" title="PageRank的参考算法（Java）"></a>PageRank的参考算法（Java）</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> test;</div><div class="line"></div><div class="line"><span class="keyword">import</span> Jama.Matrix;  </div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</div><div class="line">        <span class="keyword">double</span> [][] h = &#123;&#123;<span class="number">0</span>,<span class="number">0</span>,<span class="number">0.5</span>,<span class="number">0.5</span>&#125;,</div><div class="line">                        &#123;<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">0</span>&#125;,</div><div class="line">                        &#123;<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>&#125;,</div><div class="line">                        &#123;<span class="number">0.333333333333333333333333</span>,</div><div class="line">                          <span class="number">0.333333333333333333333333</span>,</div><div class="line">                          <span class="number">0.333333333333333333333333</span>,<span class="number">0</span>&#125;,&#125;;</div><div class="line">        Matrix hMatrix = <span class="keyword">new</span> Matrix(h);</div><div class="line">        <span class="keyword">double</span> [][] e = &#123;&#123;<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>&#125;&#125;;</div><div class="line">        Matrix eMatrix = <span class="keyword">new</span> Matrix(e);</div><div class="line">        <span class="keyword">double</span> [][] w = &#123;&#123;<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>&#125;&#125;; <span class="comment">//网页权重</span></div><div class="line">        Matrix wMatrix = <span class="keyword">new</span> Matrix(w);</div><div class="line">        <span class="keyword">double</span> [][] wLast = &#123;&#123;<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>&#125;&#125;;</div><div class="line">        Matrix wLastMatrix = <span class="keyword">new</span> Matrix(wLast);</div><div class="line">        <span class="keyword">int</span> N = <span class="number">4</span>; <span class="comment">//网页个数</span></div><div class="line">        <span class="keyword">double</span> beta = <span class="number">0.2</span>; <span class="comment">//心灵转移概率</span></div><div class="line">        <span class="keyword">double</span> error = <span class="number">0.00001</span>; <span class="comment">//收敛误差</span></div><div class="line">        <span class="keyword">while</span> (wLastMatrix.minus(wMatrix).times(wLastMatrix.minus(wMatrix)</div><div class="line">          .transpose()).get(<span class="number">0</span>, <span class="number">0</span>) &gt; error) &#123;</div><div class="line">            wLastMatrix = (Matrix) wMatrix.clone();</div><div class="line">            wMatrix = wMatrix.times(hMatrix).times(<span class="number">1</span> - beta).plus(eMatrix.times(<span class="number">1</span> * beta / N));</div><div class="line">        &#125;</div><div class="line">            wMatrix.print(<span class="number">3</span>,<span class="number">6</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><ul>
+<li><a href="http://www.sciencedirect.com/science/article/pii/S1389128612003611/pdfft?md5=0bab5eb8f1f05990052d8d2eef7c2aa7&amp;pid=1-s2.0-S1389128612003611-main.pdf" target="_blank" rel="external">The anatomy of a large-scale hypertextual Web</a></li>
+<li><a href="http://ilpubs.stanford.edu:8090/422/1/1999-66.pdf" target="_blank" rel="external">The PageRank Citation Ranking</a></li>
+<li><a href="http://ilpubs.stanford.edu:8090/770/1/2004-52.pdf" target="_blank" rel="external">Combating Web Spam with TrustRank</a></li>
+<li><a href="http://i.stanford.edu/~kvijay/krishnan-raj-airweb06.pdf" target="_blank" rel="external">Web Spam Detection with Anti-Trust Rank</a></li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/PageRank/" rel="tag"># PageRank</a>
+          
+            <a href="/tags/算法/" rel="tag"># 算法</a>
+          
+            <a href="/tags/网页排序/" rel="tag"># 网页排序</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/04/29/当使用retrofit+Rxjava时，如何得到非200响应的body/" rel="next" title="当使用retrofit+Rxjava时，如何得到非200响应的body">
+                <i class="fa fa-chevron-left"></i> 当使用retrofit+Rxjava时，如何得到非200响应的body
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/15/初探ISP对网络接入费用的定价策略/" rel="prev" title="初探ISP对网络接入费用的定价策略">
+                初探ISP对网络接入费用的定价策略 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="djjowfy" />
+          <p class="site-author-name" itemprop="name">djjowfy</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Links
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://www.rapospectre.com/" title="RaPoSpectre" target="_blank">RaPoSpectre</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://shadowwood.me" title="ShadowWood" target="_blank">ShadowWood</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://ziriwong.cc/" title="ZiriWong" target="_blank">ZiriWong</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lumiaxu.com/" title="Lumia Xu" target="_blank">Lumia Xu</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://vkwk.space/" title="Viking Warlock" target="_blank">Viking Warlock</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://toxni.com/" title="Toxni" target="_blank">Toxni</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#搜索引擎架构"><span class="nav-number">1.</span> <span class="nav-text">搜索引擎架构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#采用PageRank的原因"><span class="nav-number">2.</span> <span class="nav-text">采用PageRank的原因</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PageRank介绍"><span class="nav-number">3.</span> <span class="nav-text">PageRank介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#利用矩阵计算PageRank"><span class="nav-number">4.</span> <span class="nav-text">利用矩阵计算PageRank</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PageRank对特殊拓扑的计算"><span class="nav-number">5.</span> <span class="nav-text">PageRank对特殊拓扑的计算</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#孤岛拓扑"><span class="nav-number">5.1.</span> <span class="nav-text">孤岛拓扑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#存在自环拓扑和孤立网络块拓扑"><span class="nav-number">5.2.</span> <span class="nav-text">存在自环拓扑和孤立网络块拓扑</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PageRank的缺陷"><span class="nav-number">6.</span> <span class="nav-text">PageRank的缺陷</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#附录"><span class="nav-number">7.</span> <span class="nav-text">附录</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#PageRank的参考算法（Java）"><span class="nav-number">7.1.</span> <span class="nav-text">PageRank的参考算法（Java）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文献"><span class="nav-number">7.2.</span> <span class="nav-text">参考文献</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">djjowfy</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://djjowfy.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2016/11/13/PageRank初探/';
+          this.page.identifier = '2016/11/13/PageRank初探/';
+          this.page.title = 'PageRank初探';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://djjowfy.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("pekgUTl1Fh2Mub6DgpTGudPi-gzGzoHsz", "6VjRvGEJvzOnuLafhOj7A01o");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+          inlineMath: [ ['$', '$'] ],
+          displayMath: [ ['$$', '$$']],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        messageStyle: "none",
+        "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1006 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="算法,双调欧几里得旅行商问题,算法导论习题," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.png?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="问题简述&amp;emsp;&amp;emsp;欧几里得旅行商问题是对平面上给定的n个点确定一条连接各点的最短闭合旅程的问题。下图a给出了一个7个点问题的解。这个问题的一般形式是NP完全的，故其解需要多于多项式的时间。
+&amp;emsp;&amp;emsp;J.L.Bentley建议通过只考虑双调旅程来简化问题，这种旅程即为从最左点开始，严格地从左到右直至最右点，然后严格得从右至左直至出发点。下图b显示了同样的7个点问题的最短">
+<meta property="og:type" content="article">
+<meta property="og:title" content="对双调欧几里得旅行商问题的一些思考">
+<meta property="og:url" content="http://yoursite.com/2017/06/02/对双调欧几里得旅行商问题的一些思考/index.html">
+<meta property="og:site_name" content="djjowfy">
+<meta property="og:description" content="问题简述&amp;emsp;&amp;emsp;欧几里得旅行商问题是对平面上给定的n个点确定一条连接各点的最短闭合旅程的问题。下图a给出了一个7个点问题的解。这个问题的一般形式是NP完全的，故其解需要多于多项式的时间。
+&amp;emsp;&amp;emsp;J.L.Bentley建议通过只考虑双调旅程来简化问题，这种旅程即为从最左点开始，严格地从左到右直至最右点，然后严格得从右至左直至出发点。下图b显示了同样的7个点问题的最短">
+<meta property="og:image" content="http://yoursite.com/images/欧几里得旅行商示例.png">
+<meta property="og:updated_time" content="2017-06-02T14:57:51.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="对双调欧几里得旅行商问题的一些思考">
+<meta name="twitter:description" content="问题简述&amp;emsp;&amp;emsp;欧几里得旅行商问题是对平面上给定的n个点确定一条连接各点的最短闭合旅程的问题。下图a给出了一个7个点问题的解。这个问题的一般形式是NP完全的，故其解需要多于多项式的时间。
+&amp;emsp;&amp;emsp;J.L.Bentley建议通过只考虑双调旅程来简化问题，这种旅程即为从最左点开始，严格地从左到右直至最右点，然后严格得从右至左直至出发点。下图b显示了同样的7个点问题的最短">
+<meta name="twitter:image" content="http://yoursite.com/images/欧几里得旅行商示例.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/06/02/对双调欧几里得旅行商问题的一些思考/"/>
+
+
+
+
+
+  <title>对双调欧几里得旅行商问题的一些思考 | djjowfy</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?9d159d45332b341a4f20f312239b79f4";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">djjowfy</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/02/对双调欧几里得旅行商问题的一些思考/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="djjowfy">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="djjowfy">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">对双调欧几里得旅行商问题的一些思考</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-02T23:00:00+08:00">
+                2017-06-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/原创/" itemprop="url" rel="index">
+                    <span itemprop="name">原创</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/原创/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/06/02/对双调欧几里得旅行商问题的一些思考/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/06/02/对双调欧几里得旅行商问题的一些思考/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/06/02/对双调欧几里得旅行商问题的一些思考/" class="leancloud_visitors" data-flag-title="对双调欧几里得旅行商问题的一些思考">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="问题简述"><a href="#问题简述" class="headerlink" title="问题简述"></a>问题简述</h1><p>&emsp;&emsp;欧几里得旅行商问题是对平面上给定的n个点确定一条连接各点的最短闭合旅程的问题。<a href="#pic1">下图a</a>给出了一个7个点问题的解。这个问题的一般形式是NP完全的，故其解需要多于多项式的时间。</p>
+<p>&emsp;&emsp;<em>J.L.Bentley</em>建议通过只考虑双调旅程来简化问题，这种旅程即为从最左点开始，严格地从左到右直至最右点，然后严格得从右至左直至出发点。<a href="#pic1">下图b</a>显示了同样的7个点问题的最短双调路线。在这种情况下，多项式时间是可能的。</p>
+<p>&emsp;&emsp;描述一个确定最优双调路线的$O(n^2)$时间的算法。可以假设任何两点的$x$坐标都不相同。<br> <a id="more"></a></p>
+<img src="/images/欧几里得旅行商示例.png" width="800" height="300" title="图一&emsp;&emsp;在一个单位珊格上显示的平面上七个点。a:最短闭合曲线，长度大约是24.89.这个路线不是双调的。b:相同点集合上的最短双调闭合曲线。长度大约是25.58">
+<h1 id="题意解读"><a href="#题意解读" class="headerlink" title="题意解读"></a>题意解读</h1><p>&emsp;&emsp;假设在一个平面上有n个点。我们先假设它们是按$x$坐标单调递增排序的。也就是说，设这些点的集合为$P$，大小为$n$,其中特定的点可用$P_i(x_i,y_i)$来表示。那么当$1 \le i \lt j \le n$时，$x_i \lt x_j$。欧几里得旅行商问题就是从$P_1$出发，访问了所有的节点后，又返回到了$P_1$，但要注意的是每个节点仅访问一次。对于双调欧几里得旅行商问题来说，多出了一些约束。首先，$P_n$必须为访问路径上的最右端的节点。然后到达$P_n$前，访问的节点的$x$坐标必须是越来越大的。比如说，如果现在访问的节点是$P_i$，那么下一个要访问的节点必须是$P_j$,其中$j \gt i$。当访问到最右节点$P_n$后，这个约束又反了过来。这时访问的节点的$x$坐标必须越来越小。比如说，如果现在访问的节点是$P_i$，那么下一个要访问的节点必须是$P_j$,其中$j \lt i$。</p>
+<h1 id="求解方法"><a href="#求解方法" class="headerlink" title="求解方法"></a>求解方法</h1><h2 id="原始方法"><a href="#原始方法" class="headerlink" title="原始方法"></a>原始方法</h2><h3 id="最优子结构"><a href="#最优子结构" class="headerlink" title="最优子结构"></a>最优子结构</h3><p>&emsp;&emsp;首先肯定是把点按$x$坐标进行从小到大排序。假设排序后的序列为$P_1, P_2, P_3, … , P_n$。$d_{ij}$为从$P_i$到$P_j$的距离。</p>
+<p>&emsp;&emsp;可以把所要求的闭合回路转换成两条从最左端节点到最右端节点的两条路径。它们除了起点和终点以外没有共同的节点，并且两条路径上所经过节点的并集为整个平面上的节点。那么我们可以假设有两条除了起点和终点以外无任何的公共节点，起始点为最左端的节点$P_1$的路径$Path$和$Path^*$。然后可以用$B_{i,j}$表示，终止节点为$P_i$的$Path$的旅程和终止节点为$P_j$的$Path^<em>$的旅程之和的最小值。而$Path$和$Path^\</em>$的并集就是从$P_1$到$P_{ max \lbrace i, j \rbrace }$的所有节点。那么这时候$Path$和$Path^*$上的节点的$x$坐标都分别是严格地从小到大。显而易见，$B_{n,n}$即为我们所需要的闭合双调旅程的长度。于是现在的目标函数如下</p>
+<script type="math/tex; mode=display">
+B_{n,n}</script><p>&emsp;&emsp;现在就可以看成这两条路径都是从$P_1$生长出来，可以假定$Path$的生长速度不大于$Path^<em>$的生长速度。也就是说在$B_{i,j}$中$i$永远都不大于$j$。于是这时候就是$Path^\</em>$先生长到$P_n$节点。那么现在目标函数就如下</p>
+<script type="math/tex; mode=display">
+B_{n,n} = min\ \lbrace B_{i,n} + d_{i,n}\ \rbrace \ \ \ 1 \le i  \lt n</script><p>&emsp;&emsp;因为$d_{i,n}$易得，就是$P_i$和$P_n$两点间的距离而已。所以现在的目标是求出$B_{i,n}$。也就是要求$B_{i,j}$，当$j = n$时就为$B_{i,n}$。那么因为$1 \le i \le j \le n$。于是可以分为三种情况</p>
+<p>&emsp;&emsp;<strong>情况一</strong>&emsp;当$i \lt j - 1$时，$i \lt j - 1 \lt j$。因为$Path$的最后一个节点是$i$，而$Path^*$的最后一个节点是$j$，又因为$Path$和$Paht^*$的并集就是从$P_1$到$P_{max{\{i,j\}}}$的所有节点。也就是说，$P_{j - 1}$这个节点要么在$Path$要么在$Path^*$上。又因为$Path$和$Path^*$上的节点的$x$坐标都分别是严格地从小到大，那么$P_{j - 1}$只能在$Path^*$上，因为$Path$的最后一个节点是$P_i$，而$P_{j - 1}$的x坐标比$P_i$大，不符合约束。于是可以得到以下递推公式。</p>
+<script type="math/tex; mode=display">
+    B_{i,j} = B_{i,j-1} + d_{j-1,j} \ \ \ \ 当i \lt j - 1</script><p>&emsp;&emsp;<strong>情况二</strong>&emsp;当$i = j - 1$的时候。这种情况就比较复杂一些。因为$B_{i,j}$是$Path$和$Path^*$旅程和的最小值，设$1 \le k \lt j - 1$，那么肯定存在一个$P_k$在$Path^*$上。注意这时候$i = j - 1$，所以$P_{j - 1}$肯定不在$Path^*$上。所以</p>
+<script type="math/tex; mode=display">
+    B_{i,j} = min\ \lbrace B_{i,k} + d_{k,j}\ \rbrace \ \ \ 1 \le k  \lt j - 1</script><p>&emsp;&emsp;在上式中，因为$k \lt j - 1 = i$，也就是说需要的一部分最优子结构违反了我们的约束，需要$Path$的增长速度比$Path^*$快。但好在$B$有个美妙的性质，它是对称的。因为$B_{i,j}$就是两条符合约束的分别以$P_i$和$P_j$为终点的路径的最小距离和。$B_{i,j} = B_{j,i}$。如果$B$是个$i$行$j$列矩阵的话，我们只需要上三角。所以递推式可以改为</p>
+<script type="math/tex; mode=display">
+    B_{i,j} = min\ \lbrace B_{k,i} + d_{k,j}\ \rbrace \ \ \ 1 \le k  \lt j - 1</script><p>&emsp;&emsp;<strong>情况三</strong>&emsp;当$i = j $的时候。这种情况当且仅当$i = j = n$时才会出现，也就是说这时候已经组成闭合曲线了，也就是我们的目标函数$B_{n,n}$，</p>
+<script type="math/tex; mode=display">
+B_{n,n} = min\ \lbrace B_{i,n} + d_{i,n}\ \rbrace \ \ \ 1 \le i  \lt n</script><h3 id="复杂度分析"><a href="#复杂度分析" class="headerlink" title="复杂度分析"></a>复杂度分析</h3><p>&emsp;&emsp;情况一有$O(n^2)$次进入，但每次处理时间是常数时间，所以，情况一的复杂度是$O(n^2)$。情况二有$O(n)$次进入，每次处理时间是$O(n)$。所以情况二的复杂度是$O(n^2)$。情况三就一次进入，也就是当$i = j = n$的时候，处理时间为$O(n)$。所以整体的复杂度为$O(n^2)$。<br>&emsp;&emsp;具体来讲$Path^*$,当$j = 1$时，就是只有一个点，这时就是个常数项的时间，因为只是个赋值而已。当$j$从$2$生长到$n$。每次生长，都会发生情况一和情况二。最后一次增长会触发情况三。情况一每次都会发生$Path$从$i = 1$到$i = j-2$的增长。情况二每次都会计算最优解，而这个过程需要$j - 2$次。情况三发生后，会进行$n - 1$次的计算。于是复杂度为</p>
+<script type="math/tex; mode=display">
+    1 + \sum^n_{j = 2} (j - 2 + j - 2) + n - 1 = n^2 - 2n + 2 = O(n^2)</script><h2 id="优化"><a href="#优化" class="headerlink" title="优化"></a>优化</h2><p>&emsp;&emsp;根据约束$P_n$肯定是会和$P_{n-1}$相连，于是我们不妨设$P_{n-1}$在$Path$上，那么现在的目标函数，或者说情况三就是</p>
+<script type="math/tex; mode=display">
+B_{n,n} = B_{n-1,n} + d_{n-1,n}</script><h1 id="最终验证和代码"><a href="#最终验证和代码" class="headerlink" title="最终验证和代码"></a>最终验证和代码</h1><p>&emsp;&emsp;我们采用杭州电子科技大学的oj平台上的<a href="http://acm.hdu.edu.cn/showproblem.php?pid=2224" target="_blank" rel="external">2224题</a>进行验证。它的题目有些问题，它说输入的点的坐标是整数，但最终它的用例却用的double….这浪费了我的好长时间。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;math.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;float.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="keyword">class</span> Point&#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">    <span class="keyword">double</span> x;</div><div class="line">    <span class="keyword">double</span> y;</div><div class="line">    Point(<span class="keyword">double</span> _x,<span class="keyword">double</span> _y) : x(_x),y(_y)&#123;&#125;</div><div class="line">    Point()&#123;&#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">double</span> <span class="title">getDistance</span><span class="params">(Point *pointA,Point *pointB)</span></span>&#123;</div><div class="line">    <span class="keyword">return</span> <span class="built_in">sqrt</span>((pointA-&gt;x - pointB-&gt;x) * (pointA-&gt;x - pointB-&gt;x) </div><div class="line">    	+ (pointA-&gt;y - pointB-&gt;y) * (pointA-&gt;y - pointB-&gt;y));</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">double</span> <span class="title">min</span><span class="params">(<span class="keyword">double</span> a,<span class="keyword">double</span> b)</span></span>&#123;</div><div class="line">    <span class="keyword">if</span>(a &lt; b)&#123;</div><div class="line">        <span class="keyword">return</span> a;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> b;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">double</span> dp[<span class="number">200</span>][<span class="number">200</span>];</div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">double</span> <span class="title">solve</span><span class="params">(Point *point, <span class="keyword">int</span> size)</span></span>&#123;</div><div class="line">    dp[<span class="number">0</span>][<span class="number">0</span>] = <span class="number">0</span>;</div><div class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> j = <span class="number">1</span>,i;j &lt; size;j ++)&#123;</div><div class="line">        <span class="keyword">for</span>(i = <span class="number">0</span>;i &lt; j - <span class="number">1</span>;i ++)&#123; <span class="comment">//情况一</span></div><div class="line">            dp[i][j] = dp[i][j - <span class="number">1</span>] + getDistance(point + j - <span class="number">1</span>, point + j);</div><div class="line">        &#125;</div><div class="line">        <span class="comment">//情况二</span></div><div class="line">        i = j - <span class="number">1</span>;</div><div class="line">        dp[i][j] = FLT_MAX;</div><div class="line">        <span class="keyword">int</span> k = <span class="number">0</span>;</div><div class="line">        <span class="keyword">do</span>&#123;</div><div class="line">            dp[i][j] = min(dp[i][j], dp[k][i] </div><div class="line">            	+ getDistance(point + k, point + j));</div><div class="line">            k++;</div><div class="line">        &#125;<span class="keyword">while</span> (k &lt; j - <span class="number">1</span>);</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> dp[size - <span class="number">2</span>][size - <span class="number">1</span>] </div><div class="line">    	+ getDistance(point + size - <span class="number">2</span>, point + size - <span class="number">1</span>);<span class="comment">//情况三</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">const</span> <span class="keyword">char</span> * argv[])</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> pointNum;</div><div class="line">    Point points[<span class="number">200</span>];</div><div class="line">    <span class="keyword">while</span>(<span class="built_in">scanf</span>(<span class="string">"%d"</span>,&amp;pointNum) == <span class="number">1</span>)&#123;</div><div class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>;i &lt; pointNum;i ++)&#123;</div><div class="line">            <span class="built_in">scanf</span>(<span class="string">"%lf %lf"</span>,&amp;points[i].x,&amp;points[i].y);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">double</span> result = solve(points,pointNum);</div><div class="line">        <span class="built_in">printf</span>(<span class="string">"%.2lf\n"</span>,result);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/算法/" rel="tag"># 算法</a>
+          
+            <a href="/tags/双调欧几里得旅行商问题/" rel="tag"># 双调欧几里得旅行商问题</a>
+          
+            <a href="/tags/算法导论习题/" rel="tag"># 算法导论习题</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/25/大规模并行协同过滤算法/" rel="next" title="大规模并行协同过滤算法">
+                <i class="fa fa-chevron-left"></i> 大规模并行协同过滤算法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/01/XGBoost的原理/" rel="prev" title="XGBoost的原理">
+                XGBoost的原理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="djjowfy" />
+          <p class="site-author-name" itemprop="name">djjowfy</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Links
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://www.rapospectre.com/" title="RaPoSpectre" target="_blank">RaPoSpectre</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://shadowwood.me" title="ShadowWood" target="_blank">ShadowWood</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://ziriwong.cc/" title="ZiriWong" target="_blank">ZiriWong</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lumiaxu.com/" title="Lumia Xu" target="_blank">Lumia Xu</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://vkwk.space/" title="Viking Warlock" target="_blank">Viking Warlock</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://toxni.com/" title="Toxni" target="_blank">Toxni</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#问题简述"><span class="nav-number">1.</span> <span class="nav-text">问题简述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#题意解读"><span class="nav-number">2.</span> <span class="nav-text">题意解读</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#求解方法"><span class="nav-number">3.</span> <span class="nav-text">求解方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#原始方法"><span class="nav-number">3.1.</span> <span class="nav-text">原始方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#最优子结构"><span class="nav-number">3.1.1.</span> <span class="nav-text">最优子结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#复杂度分析"><span class="nav-number">3.1.2.</span> <span class="nav-text">复杂度分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#优化"><span class="nav-number">3.2.</span> <span class="nav-text">优化</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#最终验证和代码"><span class="nav-number">4.</span> <span class="nav-text">最终验证和代码</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">djjowfy</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://djjowfy.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2017/06/02/对双调欧几里得旅行商问题的一些思考/';
+          this.page.identifier = '2017/06/02/对双调欧几里得旅行商问题的一些思考/';
+          this.page.title = '对双调欧几里得旅行商问题的一些思考';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://djjowfy.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("pekgUTl1Fh2Mub6DgpTGudPi-gzGzoHsz", "6VjRvGEJvzOnuLafhOj7A01o");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+          inlineMath: [ ['$', '$'] ],
+          displayMath: [ ['$$', '$$']],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        messageStyle: "none",
+        "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>
