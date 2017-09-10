@@ -1,0 +1,1029 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="java,文件操作,jdk源码分析," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.png?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="前言&amp;emsp;&amp;emsp;前不久准备写一个关于文本处理的小程序，需要高效地对文本进行读取。于是就归纳了一下常见的文件读取方法，并测试了各自的时间，也阅读了相关的一些源码，希望能说清楚测试结果背后的道理，在以后用到相关操作时，能选取最佳的方法。为了减少一些无关的干扰，我们把源码里的一些检验参数等的代码省略，有些代码进行了简化。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="对java中关于文件读取方法效率的比较">
+<meta property="og:url" content="http://yoursite.com/2017/09/10/对java中关于文件读取方法效率的比较/index.html">
+<meta property="og:site_name" content="djjowfy">
+<meta property="og:description" content="前言&amp;emsp;&amp;emsp;前不久准备写一个关于文本处理的小程序，需要高效地对文本进行读取。于是就归纳了一下常见的文件读取方法，并测试了各自的时间，也阅读了相关的一些源码，希望能说清楚测试结果背后的道理，在以后用到相关操作时，能选取最佳的方法。为了减少一些无关的干扰，我们把源码里的一些检验参数等的代码省略，有些代码进行了简化。">
+<meta property="og:image" content="http://yoursite.com/images/BufferedReader类中的read函数的调用链.png">
+<meta property="og:image" content="http://yoursite.com/images/RandomAccessFile中read函数的调用链.png">
+<meta property="og:updated_time" content="2017-09-10T15:20:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="对java中关于文件读取方法效率的比较">
+<meta name="twitter:description" content="前言&amp;emsp;&amp;emsp;前不久准备写一个关于文本处理的小程序，需要高效地对文本进行读取。于是就归纳了一下常见的文件读取方法，并测试了各自的时间，也阅读了相关的一些源码，希望能说清楚测试结果背后的道理，在以后用到相关操作时，能选取最佳的方法。为了减少一些无关的干扰，我们把源码里的一些检验参数等的代码省略，有些代码进行了简化。">
+<meta name="twitter:image" content="http://yoursite.com/images/BufferedReader类中的read函数的调用链.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/09/10/对java中关于文件读取方法效率的比较/"/>
+
+
+
+
+
+  <title>对java中关于文件读取方法效率的比较 | djjowfy</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?9d159d45332b341a4f20f312239b79f4";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">djjowfy</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/10/对java中关于文件读取方法效率的比较/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="djjowfy">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="djjowfy">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">对java中关于文件读取方法效率的比较</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-10T23:30:00+08:00">
+                2017-09-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/原创/" itemprop="url" rel="index">
+                    <span itemprop="name">原创</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/原创/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/原创/java/文件操作/" itemprop="url" rel="index">
+                    <span itemprop="name">文件操作</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/原创/java/文件操作/jdk源码分析/" itemprop="url" rel="index">
+                    <span itemprop="name">jdk源码分析</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/09/10/对java中关于文件读取方法效率的比较/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/09/10/对java中关于文件读取方法效率的比较/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/09/10/对java中关于文件读取方法效率的比较/" class="leancloud_visitors" data-flag-title="对java中关于文件读取方法效率的比较">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&emsp;&emsp;前不久准备写一个关于文本处理的小程序，需要高效地对文本进行读取。于是就归纳了一下常见的文件读取方法，并测试了各自的时间，也阅读了相关的一些源码，希望能说清楚测试结果背后的道理，在以后用到相关操作时，能选取最佳的方法。为了减少一些无关的干扰，我们把源码里的一些检验参数等的代码省略，有些代码进行了简化。<br><a id="more"></a></p>
+<h1 id="常见的五类文件读取方法"><a href="#常见的五类文件读取方法" class="headerlink" title="常见的五类文件读取方法"></a>常见的五类文件读取方法</h1><h2 id="采用BufferedReader"><a href="#采用BufferedReader" class="headerlink" title="采用BufferedReader"></a>采用BufferedReader</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">long</span> <span class="title">testBuffered</span><span class="params">(String fileName)</span> <span class="keyword">throws</span> IOException</span>&#123;</div><div class="line">	Long startTime = System.currentTimeMillis();</div><div class="line">	BufferedReader reader = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> FileReader(fileName));</div><div class="line">	<span class="keyword">char</span>[] buffer=<span class="keyword">new</span> <span class="keyword">char</span>[<span class="number">8</span>*<span class="number">1024</span>];</div><div class="line">	<span class="keyword">long</span> sum = <span class="number">0</span>;</div><div class="line">	<span class="keyword">while</span>((count=reader.read(buffer))!=-<span class="number">1</span>)</div><div class="line">	&#123;</div><div class="line">	    sum += count;</div><div class="line">	&#125;</div><div class="line">	reader.close();</div><div class="line">	Long endTime = System.currentTimeMillis();</div><div class="line">	System.out.println(<span class="string">"Total time of BufferedReader is "</span>+ (endTime - startTime) + <span class="string">" milliseconds, Total byte is "</span> + sum);</div><div class="line">	<span class="keyword">return</span> endTime - startTime;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;BufferedReader是一个很常见的文件读取方法。buffer的大小为8*1024。这是因为为了和BufferedReader里的缓存进行统一。BufferedReader的构造函数如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">char</span> cb[];</div><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> defaultCharBufferSize = <span class="number">8192</span>;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="title">BufferedReader</span><span class="params">(Reader in, <span class="keyword">int</span> sz)</span> </span>&#123;</div><div class="line">    <span class="keyword">super</span>(in);</div><div class="line">    <span class="keyword">this</span>.in = in;</div><div class="line">    cb = <span class="keyword">new</span> <span class="keyword">char</span>[sz];</div><div class="line">    nextChar = nChars = <span class="number">0</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="title">BufferedReader</span><span class="params">(Reader in)</span> </span>&#123;</div><div class="line">    <span class="keyword">this</span>(in, defaultCharBufferSize);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;我们可以看到如果构造时未输入参数，那么这个大小就是默认的defaultCharBufferSize也就是$8192=8*1024$，用这个大小呢，创建了一个私有数据cb，我猜它是charbuffer的缩写。而BufferedReader的读一串字符调用的是如下函数。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">read</span><span class="params">(<span class="keyword">char</span> cbuf[], <span class="keyword">int</span> off, <span class="keyword">int</span> len)</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">        <span class="keyword">synchronized</span> (lock) &#123;</div><div class="line">            <span class="keyword">int</span> n = read1(cbuf, off, len);</div><div class="line">            <span class="keyword">if</span> (n &lt;= <span class="number">0</span>) <span class="keyword">return</span> n;</div><div class="line">            <span class="keyword">while</span> ((n &lt; len) &amp;&amp; in.ready()) &#123;</div><div class="line">                <span class="keyword">int</span> n1 = read1(cbuf, off + n, len - n);</div><div class="line">                <span class="keyword">if</span> (n1 &lt;= <span class="number">0</span>) <span class="keyword">break</span>;</div><div class="line">                n += n1;</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">return</span> n;</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;可见它是循环调用read1把传入的数组(cbuf)填充到要求的长度(len)。然后后面就是一连串的调用链如下图</p>
+<img src="/images/BufferedReader类中的read函数的调用链.png" title="BufferedReader类中的read函数的调用链">
+<p>&emsp;&emsp;经过各种嵌套调用后，最后是用的是FileChannel，这也是本文里的第四种方法，于是当然，BufferedReader的效率很差。</p>
+<h2 id="采用RandomAccessFile"><a href="#采用RandomAccessFile" class="headerlink" title="采用RandomAccessFile"></a>采用RandomAccessFile</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">long</span> <span class="title">testRandomAccess</span><span class="params">(String fileName)</span> <span class="keyword">throws</span> IOException</span>&#123;</div><div class="line">	Long startTime = System.currentTimeMillis();</div><div class="line">	RandomAccessFile reader = <span class="keyword">new</span> RandomAccessFile(fileName,<span class="string">"r"</span>);</div><div class="line">	<span class="keyword">int</span> count;</div><div class="line">	<span class="keyword">byte</span>[] buffer=<span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">8</span>*<span class="number">1024</span>];<span class="comment">//缓冲区</span></div><div class="line">	<span class="keyword">long</span> sum = <span class="number">0</span>;</div><div class="line">	<span class="keyword">while</span>((count=reader.read(buffer))!=-<span class="number">1</span>)&#123;</div><div class="line">	    sum += count;</div><div class="line">	&#125;</div><div class="line">	reader.close();</div><div class="line">	Long endTime = System.currentTimeMillis();</div><div class="line">	System.out.println(<span class="string">"Total time of RandomAccess is "</span>+ (endTime - startTime) + <span class="string">" milliseconds, Total byte is "</span> + sum);</div><div class="line">	<span class="keyword">return</span> endTime - startTime;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;为啥上述代码里的buffer也是8k呢？这是因为调用链如下</p>
+<img src="/images/RandomAccessFile中read函数的调用链.png" title="RandomAccessFile中read函数的调用链">
+<p>&emsp;&emsp;可见该函数的调用链很短，而且是用native函数进行操作。最后的io_util.c的相关代码如下</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">define</span> BUF_SIZE 8192</span></div><div class="line"></div><div class="line"><span class="function">jint</span></div><div class="line"><span class="title">readBytes</span><span class="params">(JNIEnv *env, jobject <span class="keyword">this</span>, jbyteArray bytes,</span></div><div class="line">          jint off, jint len, jfieldID fid)</div><div class="line">&#123;</div><div class="line">    jint nread;</div><div class="line">    <span class="keyword">char</span> stackBuf[BUF_SIZE];</div><div class="line">    <span class="keyword">char</span> *buf = stackBuf;</div><div class="line">    <span class="keyword">if</span> (len &gt; BUF_SIZE) &#123;</div><div class="line">        buf = <span class="built_in">malloc</span>(len);</div><div class="line">    &#125; </div><div class="line">    fd = GET_FD(<span class="keyword">this</span>, fid);</div><div class="line">    nread = IO_Read(fd, buf, len);</div><div class="line">    (*env)-&gt;SetByteArrayRegion(env, bytes, off, nread, (jbyte *)buf);</div><div class="line">    <span class="keyword">if</span> (buf != stackBuf) &#123;</div><div class="line">        <span class="built_in">free</span>(buf);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> nread;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;从上述代码可以知道，如果要读的数组的长度不大于8192，那么就直接用该局部变量。如果大于，那么就需要重新分配这么一块内存。因此我们在测试代码里，选择了8192这样的长度，就是为了避免调用时需要从堆上分配内存，毕竟C中的malloc和free都不是很快，完全是效率黑洞。</p>
+<h2 id="采用FileInputStream"><a href="#采用FileInputStream" class="headerlink" title="采用FileInputStream"></a>采用FileInputStream</h2><p>&emsp;&emsp;这种方式也很常见，原理也和名字一样，把文件变成输入流，然后一个字符一个字符的读取。它是调用了InputStream的read函数实现的，代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">read</span><span class="params">(<span class="keyword">byte</span> b[], <span class="keyword">int</span> off, <span class="keyword">int</span> len)</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">    <span class="keyword">int</span> c = read();</div><div class="line">    <span class="keyword">if</span> (c == -<span class="number">1</span>) &#123;</div><div class="line">        <span class="keyword">return</span> -<span class="number">1</span>;</div><div class="line">    &#125;</div><div class="line">    b[off] = (<span class="keyword">byte</span>)c;</div><div class="line"></div><div class="line">    <span class="keyword">int</span> i = <span class="number">1</span>;</div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">        <span class="keyword">for</span> (; i &lt; len ; i++) &#123;</div><div class="line">            c = read();</div><div class="line">            <span class="keyword">if</span> (c == -<span class="number">1</span>) &#123;</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            &#125;</div><div class="line">            b[off + i] = (<span class="keyword">byte</span>)c;</div><div class="line">        &#125;</div><div class="line">    &#125; <span class="keyword">catch</span> (IOException ee) &#123;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> i;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="采用与ByteBuffer配合的FileChannel"><a href="#采用与ByteBuffer配合的FileChannel" class="headerlink" title="采用与ByteBuffer配合的FileChannel"></a>采用与ByteBuffer配合的FileChannel</h2><p>&emsp;&emsp;这种方式就和第一种方式的最后的调用那里差不多，所以速度按理来说还行。代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">long</span> <span class="title">testFileStreamChannel</span><span class="params">(String fileName)</span> <span class="keyword">throws</span> IOException</span>&#123;</div><div class="line">	Long startTime = System.currentTimeMillis();</div><div class="line">	FileInputStream reader = <span class="keyword">new</span> FileInputStream(fileName);</div><div class="line">	FileChannel ch = reader.getChannel();</div><div class="line">	ByteBuffer bb = ByteBuffer.allocate(<span class="number">8</span>*<span class="number">1024</span>);</div><div class="line">	<span class="keyword">long</span> sum = <span class="number">0</span>;</div><div class="line">	<span class="keyword">int</span> count;</div><div class="line">	<span class="keyword">while</span> ((count=ch.read(bb)) != -<span class="number">1</span> )</div><div class="line">	&#123;</div><div class="line">	    sum += count;</div><div class="line">	    bb.clear();</div><div class="line">	&#125;</div><div class="line">	reader.close();</div><div class="line">	Long endTime = System.currentTimeMillis();</div><div class="line">	System.out.println(<span class="string">"Total time of FileStreamChannel is "</span>+ (endTime - startTime) + <span class="string">" milliseconds, Total byte is "</span> + sum);</div><div class="line">	<span class="keyword">return</span> endTime - startTime;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;它调用的FileChannel的read函数其实内部是用IOUtill里的read。代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">read</span><span class="params">(FileDescriptor fd, ByteBuffer dst, <span class="keyword">long</span> position, NativeDispatcher nd)</span> <span class="keyword">throws</span> IOException</span></div><div class="line">&#123;</div><div class="line">     <span class="keyword">if</span> (dst <span class="keyword">instanceof</span> DirectBuffer)</div><div class="line">         <span class="keyword">return</span> readIntoNativeBuffer(fd, dst, position, nd);</div><div class="line"></div><div class="line">     ByteBuffer bb = Util.getTemporaryDirectBuffer(dst.remaining());</div><div class="line">     <span class="keyword">try</span> &#123;</div><div class="line">         <span class="keyword">int</span> n = readIntoNativeBuffer(fd, bb, position, nd);</div><div class="line">         bb.flip();</div><div class="line">         <span class="keyword">if</span> (n &gt; <span class="number">0</span>)</div><div class="line">             dst.put(bb);<span class="comment">//放入传入的缓存</span></div><div class="line">         <span class="keyword">return</span> n;</div><div class="line">     &#125; <span class="keyword">finally</span> &#123;</div><div class="line">         Util.offerFirstTemporaryDirectBuffer(bb);</div><div class="line">     &#125;</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;他就是申请一块临时堆外DirectByteBuffer，大小同传入的buffer的大小。然后读取文件，最后在把它放回传入的缓存。</p>
+<h2 id="采用与MappedByteBuffer相结合的FileChannel"><a href="#采用与MappedByteBuffer相结合的FileChannel" class="headerlink" title="采用与MappedByteBuffer相结合的FileChannel"></a>采用与MappedByteBuffer相结合的FileChannel</h2><p>这类方法很少见。测试代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">long</span> <span class="title">testFileStreamChannelMap</span><span class="params">(String fileName)</span> <span class="keyword">throws</span> IOException</span>&#123;</div><div class="line">	Long startTime = System.currentTimeMillis();</div><div class="line">	FileInputStream reader = <span class="keyword">new</span> FileInputStream(fileName);</div><div class="line">	FileChannel ch = reader.getChannel();</div><div class="line">	MappedByteBuffer mb =ch.map( FileChannel.MapMode.READ_ONLY,<span class="number">0L</span>, ch.size() );<span class="comment">//这是关键</span></div><div class="line">	<span class="keyword">long</span> sum = <span class="number">0</span>;</div><div class="line">	sum = mb.limit();</div><div class="line">	reader.close();</div><div class="line">	Long endTime = System.currentTimeMillis();</div><div class="line">	System.out.println(<span class="string">"Total time of testFileStreamChannelMap is "</span>+ (endTime - startTime) + <span class="string">" milliseconds, Total byte is "</span> + sum);</div><div class="line">	<span class="keyword">return</span> endTime - startTime;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;我们现在看看上面有注释的那句话干了什么</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> MappedByteBuffer <span class="title">map</span><span class="params">(MapMode mode, <span class="keyword">long</span> position, <span class="keyword">long</span> size)</span> <span class="keyword">throws</span> IOException</span></div><div class="line">&#123;          </div><div class="line">    <span class="keyword">int</span> pagePosition = (<span class="keyword">int</span>)(position % allocationGranularity);</div><div class="line">    <span class="keyword">long</span> mapPosition = position - pagePosition;</div><div class="line">    <span class="keyword">long</span> mapSize = size + pagePosition;</div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">        <span class="comment">// native方法，返回一个内存映射的地址</span></div><div class="line">        addr = map0(imode, mapPosition, mapSize);</div><div class="line">    &#125; <span class="keyword">catch</span> (OutOfMemoryError x) &#123;</div><div class="line">        <span class="comment">// 内存不够，手动gc,然后再来</span></div><div class="line">        System.gc();</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            Thread.sleep(<span class="number">100</span>);</div><div class="line">        &#125; <span class="keyword">catch</span> (InterruptedException y) &#123;</div><div class="line">            Thread.currentThread().interrupt();</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            addr = map0(imode, mapPosition, mapSize);</div><div class="line">        &#125; <span class="keyword">catch</span> (OutOfMemoryError y) &#123;</div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IOException(<span class="string">"Map failed"</span>, y);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="comment">//根据地址，构造一个Buffer返回</span></div><div class="line">    <span class="keyword">return</span> Util.newMappedByteBufferR(isize, addr + pagePosition, mfd, um);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;上述代码中Util.newMappedByteBufferR这个名字很容易让人误解，其实它构造的是MappedByteBuffer的子类DirectByteBuffer的子类DirectByteBufferR。也就是说，它获取了文件在虚拟内存中映射的地址，并构造了一个DirectByteBufferR。这种类型的好处是，它是直接操纵那块虚拟内存的。</p>
+<h1 id="测试和分析总结"><a href="#测试和分析总结" class="headerlink" title="测试和分析总结"></a>测试和分析总结</h1><p>&emsp;&emsp;我们现在可以开始对这四种方法的读取速率进行测试了，将生成大小大约是1KB，128KB，256KB，512KB，768KB，1MB，128MB，256MB，512MB，768MB，1GB的文件进行读取。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">generateFile</span><span class="params">(String fileName,<span class="keyword">long</span> size)</span></span>&#123;</div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">        BufferedWriter writer = <span class="keyword">new</span> BufferedWriter(<span class="keyword">new</span> FileWriter(fileName),<span class="number">8</span>*<span class="number">1024</span>);</div><div class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> count = <span class="number">0</span>;count &lt; size;count ++)&#123;</div><div class="line">            writer.write(<span class="string">'a'</span>);</div><div class="line">        &#125;</div><div class="line">        writer.close();</div><div class="line">    &#125;<span class="keyword">catch</span> (IOException e)&#123;</div><div class="line">        e.printStackTrace();</div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">    String fileName = <span class="string">"data.txt"</span>;</div><div class="line">    <span class="keyword">long</span> m = <span class="number">1024</span> ;</div><div class="line">    <span class="keyword">long</span> size[] = &#123;m,m * <span class="number">128</span>,m * <span class="number">256</span>,m * <span class="number">512</span>,m * <span class="number">768</span>,m * <span class="number">1024</span>,m * <span class="number">1024</span> * <span class="number">128</span>,m * <span class="number">1024</span> * <span class="number">256</span>,m * <span class="number">1024</span> * <span class="number">512</span>,m * <span class="number">1024</span> * <span class="number">768</span>,m * <span class="number">1024</span> * <span class="number">1024</span>&#125;;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>;i &lt; size.length;i ++ ) &#123;</div><div class="line">        generateFile(fileName, size[i]);</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            testBuffered(fileName);</div><div class="line">            testRandomAccess(fileName);</div><div class="line">            testFileStream(fileName);</div><div class="line">            testFileStreamChannel(fileName);</div><div class="line">            testFileStreamChannelMap(fileName);</div><div class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">        System.out.println(<span class="string">"--------------------------------------------------------"</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;测试得到的输出如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div></pre></td><td class="code"><pre><div class="line">Total time of BufferedReader is 1 milliseconds, Total byte is 1024</div><div class="line">Total time of RandomAccess is 1 milliseconds, Total byte is 1024</div><div class="line">Total time of FileStream is 0 milliseconds, Total byte is 1024</div><div class="line">Total time of FileStreamChannel is 17 milliseconds, Total byte is 1024</div><div class="line">Total time of testFileStreamChannelMap is 3 milliseconds, Total byte is 1024</div><div class="line">--------------------------------------------------------</div><div class="line">Total time of BufferedReader is 16 milliseconds, Total byte is 131072</div><div class="line">Total time of RandomAccess is 0 milliseconds, Total byte is 131072</div><div class="line">Total time of FileStream is 0 milliseconds, Total byte is 131072</div><div class="line">Total time of FileStreamChannel is 0 milliseconds, Total byte is 131072</div><div class="line">Total time of testFileStreamChannelMap is 0 milliseconds, Total byte is 131072</div><div class="line">--------------------------------------------------------</div><div class="line">Total time of BufferedReader is 5 milliseconds, Total byte is 262144</div><div class="line">Total time of RandomAccess is 1 milliseconds, Total byte is 262144</div><div class="line">Total time of FileStream is 0 milliseconds, Total byte is 262144</div><div class="line">Total time of FileStreamChannel is 1 milliseconds, Total byte is 262144</div><div class="line">Total time of testFileStreamChannelMap is 0 milliseconds, Total byte is 262144</div><div class="line">--------------------------------------------------------</div><div class="line">Total time of BufferedReader is 9 milliseconds, Total byte is 524288</div><div class="line">Total time of RandomAccess is 0 milliseconds, Total byte is 524288</div><div class="line">Total time of FileStream is 0 milliseconds, Total byte is 524288</div><div class="line">Total time of FileStreamChannel is 1 milliseconds, Total byte is 524288</div><div class="line">Total time of testFileStreamChannelMap is 0 milliseconds, Total byte is 524288</div><div class="line">--------------------------------------------------------</div><div class="line">Total time of BufferedReader is 10 milliseconds, Total byte is 786432</div><div class="line">Total time of RandomAccess is 0 milliseconds, Total byte is 786432</div><div class="line">Total time of FileStream is 0 milliseconds, Total byte is 786432</div><div class="line">Total time of FileStreamChannel is 5 milliseconds, Total byte is 786432</div><div class="line">Total time of testFileStreamChannelMap is 0 milliseconds, Total byte is 786432</div><div class="line">--------------------------------------------------------</div><div class="line">Total time of BufferedReader is 2 milliseconds, Total byte is 1048576</div><div class="line">Total time of RandomAccess is 1 milliseconds, Total byte is 1048576</div><div class="line">Total time of FileStream is 0 milliseconds, Total byte is 1048576</div><div class="line">Total time of FileStreamChannel is 3 milliseconds, Total byte is 1048576</div><div class="line">Total time of testFileStreamChannelMap is 1 milliseconds, Total byte is 1048576</div><div class="line">--------------------------------------------------------</div><div class="line">Total time of BufferedReader is 146 milliseconds, Total byte is 134217728</div><div class="line">Total time of RandomAccess is 43 milliseconds, Total byte is 134217728</div><div class="line">Total time of FileStream is 44 milliseconds, Total byte is 134217728</div><div class="line">Total time of FileStreamChannel is 89 milliseconds, Total byte is 134217728</div><div class="line">Total time of testFileStreamChannelMap is 0 milliseconds, Total byte is 134217728</div><div class="line">--------------------------------------------------------</div><div class="line">Total time of BufferedReader is 230 milliseconds, Total byte is 268435456</div><div class="line">Total time of RandomAccess is 88 milliseconds, Total byte is 268435456</div><div class="line">Total time of FileStream is 85 milliseconds, Total byte is 268435456</div><div class="line">Total time of FileStreamChannel is 107 milliseconds, Total byte is 268435456</div><div class="line">Total time of testFileStreamChannelMap is 0 milliseconds, Total byte is 268435456</div><div class="line">--------------------------------------------------------</div><div class="line">Total time of BufferedReader is 463 milliseconds, Total byte is 536870912</div><div class="line">Total time of RandomAccess is 193 milliseconds, Total byte is 536870912</div><div class="line">Total time of FileStream is 393 milliseconds, Total byte is 536870912</div><div class="line">Total time of FileStreamChannel is 379 milliseconds, Total byte is 536870912</div><div class="line">Total time of testFileStreamChannelMap is 0 milliseconds, Total byte is 536870912</div><div class="line">--------------------------------------------------------</div><div class="line">Total time of BufferedReader is 844 milliseconds, Total byte is 805306368</div><div class="line">Total time of RandomAccess is 282 milliseconds, Total byte is 805306368</div><div class="line">Total time of FileStream is 273 milliseconds, Total byte is 805306368</div><div class="line">Total time of FileStreamChannel is 255 milliseconds, Total byte is 805306368</div><div class="line">Total time of testFileStreamChannelMap is 0 milliseconds, Total byte is 805306368</div><div class="line">--------------------------------------------------------</div><div class="line">Total time of BufferedReader is 1097 milliseconds, Total byte is 1073741824</div><div class="line">Total time of RandomAccess is 407 milliseconds, Total byte is 1073741824</div><div class="line">Total time of FileStream is 348 milliseconds, Total byte is 1073741824</div><div class="line">Total time of FileStreamChannel is 395 milliseconds, Total byte is 1073741824</div><div class="line">Total time of testFileStreamChannelMap is 0 milliseconds, Total byte is 1073741824</div><div class="line">--------------------------------------------------------</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;可以看见第一种方法所用的时间最长，这是完全符合我们的预期的。而最后一种因为直接操纵内存，所以时间可以忽略。最后因为要构造BufferedCache，所以在小文件上也会花一些时间。于是我们可以得出结论BufferedReader效率怎么都比较低，完全可以弃用。如果只是第一次读取小文件的话，不要用关于FileChannel的方法。输入缓冲期不要大于8K，因为大部分的默认缓冲区都是8K，这样可以容易配合。虽然在测试中FileChannel配合MappedByteBuffer在大文件中取得了很优异的效果，但是在实际使用中，用这个的还是比较少。因为它存在很多问题如内存占用、文件关闭不确定，被其打开的文件只有在垃圾回收的才会被关闭，而且这个时间点是不确定的。而这些问题是大部分程序员所深恶痛绝的，毕竟这些行为没法自己控制。不能重现的Bug最难修啊。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java/" rel="tag"># java</a>
+          
+            <a href="/tags/文件操作/" rel="tag"># 文件操作</a>
+          
+            <a href="/tags/jdk源码分析/" rel="tag"># jdk源码分析</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/01/XGBoost的原理/" rel="next" title="XGBoost的原理">
+                <i class="fa fa-chevron-left"></i> XGBoost的原理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="djjowfy" />
+          <p class="site-author-name" itemprop="name">djjowfy</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">23</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Links
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://www.rapospectre.com/" title="RaPoSpectre" target="_blank">RaPoSpectre</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://shadowwood.me" title="ShadowWood" target="_blank">ShadowWood</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://ziriwong.cc/" title="ZiriWong" target="_blank">ZiriWong</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lumiaxu.com/" title="Lumia Xu" target="_blank">Lumia Xu</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://vkwk.space/" title="Viking Warlock" target="_blank">Viking Warlock</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://toxni.com/" title="Toxni" target="_blank">Toxni</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#常见的五类文件读取方法"><span class="nav-number">2.</span> <span class="nav-text">常见的五类文件读取方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#采用BufferedReader"><span class="nav-number">2.1.</span> <span class="nav-text">采用BufferedReader</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#采用RandomAccessFile"><span class="nav-number">2.2.</span> <span class="nav-text">采用RandomAccessFile</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#采用FileInputStream"><span class="nav-number">2.3.</span> <span class="nav-text">采用FileInputStream</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#采用与ByteBuffer配合的FileChannel"><span class="nav-number">2.4.</span> <span class="nav-text">采用与ByteBuffer配合的FileChannel</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#采用与MappedByteBuffer相结合的FileChannel"><span class="nav-number">2.5.</span> <span class="nav-text">采用与MappedByteBuffer相结合的FileChannel</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#测试和分析总结"><span class="nav-number">3.</span> <span class="nav-text">测试和分析总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">djjowfy</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://djjowfy.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2017/09/10/对java中关于文件读取方法效率的比较/';
+          this.page.identifier = '2017/09/10/对java中关于文件读取方法效率的比较/';
+          this.page.title = '对java中关于文件读取方法效率的比较';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://djjowfy.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("pekgUTl1Fh2Mub6DgpTGudPi-gzGzoHsz", "6VjRvGEJvzOnuLafhOj7A01o");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+          inlineMath: [ ['$', '$'] ],
+          displayMath: [ ['$$', '$$']],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        messageStyle: "none",
+        "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>
