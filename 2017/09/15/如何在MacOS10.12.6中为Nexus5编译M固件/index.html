@@ -1,0 +1,1184 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="java,Android,Nexus5固件,编译Android源码," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.png?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="前言&amp;emsp;&amp;emsp;Marshmallow，也就是Android6现在对于我们来说也是古老的东西了，所以在编译就会遇到各种版本问题。于是就想写篇文章，把遇到的坑记录下来。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何在MacOS10.12.6中为Nexus5编译M固件">
+<meta property="og:url" content="http://yoursite.com/2017/09/15/如何在MacOS10.12.6中为Nexus5编译M固件/index.html">
+<meta property="og:site_name" content="djjowfy">
+<meta property="og:description" content="前言&amp;emsp;&amp;emsp;Marshmallow，也就是Android6现在对于我们来说也是古老的东西了，所以在编译就会遇到各种版本问题。于是就想写篇文章，把遇到的坑记录下来。">
+<meta property="og:image" content="http://yoursite.com/images/Nexus5.png">
+<meta property="og:updated_time" content="2017-09-15T13:14:02.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="如何在MacOS10.12.6中为Nexus5编译M固件">
+<meta name="twitter:description" content="前言&amp;emsp;&amp;emsp;Marshmallow，也就是Android6现在对于我们来说也是古老的东西了，所以在编译就会遇到各种版本问题。于是就想写篇文章，把遇到的坑记录下来。">
+<meta name="twitter:image" content="http://yoursite.com/images/Nexus5.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/09/15/如何在MacOS10.12.6中为Nexus5编译M固件/"/>
+
+
+
+
+
+  <title>如何在MacOS10.12.6中为Nexus5编译M固件 | djjowfy</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?9d159d45332b341a4f20f312239b79f4";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">djjowfy</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/15/如何在MacOS10.12.6中为Nexus5编译M固件/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="djjowfy">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="djjowfy">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">如何在MacOS10.12.6中为Nexus5编译M固件</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-15T21:00:00+08:00">
+                2017-09-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/原创/" itemprop="url" rel="index">
+                    <span itemprop="name">原创</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/原创/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/09/15/如何在MacOS10.12.6中为Nexus5编译M固件/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/09/15/如何在MacOS10.12.6中为Nexus5编译M固件/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/09/15/如何在MacOS10.12.6中为Nexus5编译M固件/" class="leancloud_visitors" data-flag-title="如何在MacOS10.12.6中为Nexus5编译M固件">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&emsp;&emsp;Marshmallow，也就是Android6现在对于我们来说也是古老的东西了，所以在编译就会遇到各种版本问题。于是就想写篇文章，把遇到的坑记录下来。<br><a id="more"></a></p>
+<h1 id="初始编译环境"><a href="#初始编译环境" class="headerlink" title="初始编译环境"></a>初始编译环境</h1><div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">环境</th>
+<th style="text-align:center">版本号</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">MacOS</td>
+<td style="text-align:center">10.12.6</td>
+</tr>
+<tr>
+<td style="text-align:center">JDK</td>
+<td style="text-align:center">1.8</td>
+</tr>
+<tr>
+<td style="text-align:center">MacOSX-SDK</td>
+<td style="text-align:center">12</td>
+</tr>
+<tr>
+<td style="text-align:center">手机</td>
+<td style="text-align:center">Nexus5(GSM/LTE)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>&emsp;&emsp;其他的make等版本号，基本不用怎么管，就新版的。MacOSX-SDK下面出问题的时候再稍微详细地说一下。</p>
+<h1 id="初始工作"><a href="#初始工作" class="headerlink" title="初始工作"></a>初始工作</h1><p>&emsp;&emsp;按照官网的教程,<a href="https://source.android.com/source/initializing" target="_blank" rel="external">搭建编译环境</a>和<a href="https://source.android.com/source/downloading" target="_blank" rel="external">下载源代码</a>，一步一步来。<br>&emsp;&emsp;这里需要注意的是：因为我们的都是是Nexus5，所以版本最高只能到<strong>Android 6.0.1</strong>。所以我在配置远程仓库路径的时候用的是</p>
+<blockquote>
+<p>repo init -u <a href="https://android.googlesource.com/platform/manifest" target="_blank" rel="external">https://android.googlesource.com/platform/manifest</a> -b android-6.0.1_r1</p>
+</blockquote>
+<p>&emsp;&emsp;当然这时候需要翻墙，推荐用kcptun加速，它能让搬瓦工最便宜的那种小水管都能达到近2M/s的下载速率。这样能保证repo sync的成功率，要知道这玩意失败后会留下一堆临时文件，还不能断点续传。网上流传的加<em>-f</em>参数只不过是让它不要让失败终止，而是继续下载。下面是我改写的下载脚本。功能就是失败后继续下载，然后统计一下次数，给个交代</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line">count=1;</div><div class="line">repo sync;</div><div class="line">while [ $? == 1 ]; do</div><div class="line">    echo &quot;$count Sync failed, repeat again:&quot;;</div><div class="line">    find . -iname tmp_pack_* | xargs rm</div><div class="line">    sleep 3</div><div class="line">    let count++;</div><div class="line">    repo sync;</div><div class="line">done</div><div class="line">echo &quot;finish $count sync&quot;;</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;因为我已经在git上设置了代理，于是这里就不用proxychains4了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git config --global http.proxy &apos;socks5://127.0.0.1:1080&apos;</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;有些博客会让人加个https.proxy。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git config --global https.proxy &apos;socks5://127.0.0.1:1080&apos;</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;可我看<a href="https://git-scm.com/docs/git-config#git-config-httpproxy" target="_blank" rel="external">文档</a>好像是没有这个东西的</p>
+<blockquote>
+<p><strong>http.proxy</strong><br>Override the HTTP proxy, normally configured using the <em>http_proxy</em>, <em>https_proxy</em>, and <em>all_proxy</em>environment variables (see curl(1)). In addition to the syntax understood by curl, it is possible to specify a proxy string with a user name but no password, in which case git will attempt to acquire one in the same way it does for other credentials. See <a href="https://git-scm.com/docs/gitcredentials" target="_blank" rel="external">gitcredentials[7]</a> for more information. The syntax thus is<em>[protocol://][user[:password]@]proxyhost[:port]</em>. This can be overridden on a per-remote basis; see remote.<name>.proxy</name></p>
+</blockquote>
+<p>&emsp;&emsp;按照这个文档来说，http.proxy既管http也管https，所以就没有https.proxy了。不过加上https.proxy也不会报错。当然如果只写了https.proxy肯定不会有效果就是了。</p>
+<h1 id="构建"><a href="#构建" class="headerlink" title="构建"></a>构建</h1><h2 id="下载驱动"><a href="#下载驱动" class="headerlink" title="下载驱动"></a>下载驱动</h2><p>&emsp;&emsp;这个在<a href="https://developers.google.com/android/drivers" target="_blank" rel="external">官网</a>上叫做硬件支持的二进制文件。这时候我们要根据在初始工作中选择的分支看它对应的细分版本号是多少，然后再通过这个版本号找到相应的驱动。所以至少需要了两个表<br>&emsp;&emsp;第一个表是<a href="https://source.android.com/source/build-numbers" target="_blank" rel="external">源代码标记和细分版本</a>。这个表很长，下面就节选我们所需要部分的附近几行</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">细分版本</th>
+<th style="text-align:center">分支</th>
+<th style="text-align:center">版本</th>
+<th style="text-align:center">支持的设备</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">MXB48J</td>
+<td style="text-align:center">android-6.0.1_r4</td>
+<td style="text-align:center">Marshmallow</td>
+<td style="text-align:center">Pixel C</td>
+</tr>
+<tr>
+<td style="text-align:center">MMB29M</td>
+<td style="text-align:center">android-6.0.1_r3</td>
+<td style="text-align:center">Marshmallow</td>
+<td style="text-align:center">Nexus 6P、Nexus Player</td>
+</tr>
+<tr>
+<td style="text-align:center">MMB29K</td>
+<td style="text-align:center">android-6.0.1_r1</td>
+<td style="text-align:center">Marshmallow</td>
+<td style="text-align:center">Nexus 5、Nexus 5X、Nexus 6、Nexus 7 (flo/deb)、Nexus 9 (volantis/volantisg)</td>
+</tr>
+<tr>
+<td style="text-align:center">MMB29N</td>
+<td style="text-align:center">android-6.0.0_r41</td>
+<td style="text-align:center">Marshmallow</td>
+<td style="text-align:center">Nexus 6P</td>
+</tr>
+<tr>
+<td style="text-align:center">MDB08M</td>
+<td style="text-align:center">android-6.0.0_r26</td>
+<td style="text-align:center">Marshmallow</td>
+<td style="text-align:center">Nexus 5X、Nexus 6P</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>&emsp;&emsp;在这个表中找到版本号（MMB29K）后，可以去<a href="https://developers.google.com/android/drivers" target="_blank" rel="external">二进制驱动的下载页面</a>中下载对应的驱动。这个页面很长，还是 <em>cmd+F</em> 方便。下面是我们所需要的部分：</p>
+<p>Nexus 5 (GSM/LTE) binaries for Android 6.0.1 (MMB29K)</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Hardware Component</th>
+<th style="text-align:center">Company</th>
+<th style="text-align:center">Download</th>
+<th style="text-align:left">SHA-256 Checksum</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">NFC, Bluetooth, Wi-Fi</td>
+<td style="text-align:center">Broadcom</td>
+<td style="text-align:center"><a href="https://dl.google.com/dl/android/aosp/broadcom-hammerhead-mmb29k-f2c62bd2.tgz" target="_blank" rel="external">Link</a></td>
+<td style="text-align:left">9afb80be898957781aa2e5c05548e0d0ffbfc8fbd976fda4525ea4bda1bdf403</td>
+</tr>
+<tr>
+<td style="text-align:center">Camera, Sensors, Audio</td>
+<td style="text-align:center">LG</td>
+<td style="text-align:center"><a href="https://dl.google.com/dl/android/aosp/lge-hammerhead-mmb29k-2f194a93.tgz" target="_blank" rel="external">Link</a></td>
+<td style="text-align:left">5ffaf75530875f8d709bba141e20db4d54417a21246dcceeb6a1194f707995be</td>
+</tr>
+<tr>
+<td style="text-align:center">Graphics, GSM, Camera, GPS, Sensors, Media, DSP, USB</td>
+<td style="text-align:center">Qualcomm</td>
+<td style="text-align:center"><a href="https://dl.google.com/dl/android/aosp/qcom-hammerhead-mmb29k-8c91e1b3.tgz" target="_blank" rel="external">Link</a></td>
+<td style="text-align:left">92d92325a3febc6ff39144ef3472fbdc6756bb81d950df67e9c29b5ada80fbf1</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>&emsp;&emsp;下载完成后解压（tar -zxvf  *.tgz）到源码的根目录（默认为<em>/Volumes/android</em>），这样就会看到 <em>extract-公司名-版本代码.sh</em>为名字的脚本。然后执行，就会发现给了一个协议让你最后输入一个 <em>I ACCEPT</em> 。所以可以疯狂按会车，到第八条慢一些，第e小条的下面就让你输 <em>I ACCEPT</em> 了。接受这个协议后，它会自解压一些文件到vendor这个文件夹。</p>
+<h2 id="清理"><a href="#清理" class="headerlink" title="清理"></a>清理</h2><p>&emsp;&emsp;为了确保新安装的二进制文件在解压后会被适当考虑在内，请使用以下命令删除所有以前编译操作的已有输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">make clobber</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;这时候会出现一些错误，参见后面的<a href="#遇到的问题">遇到的问题</a>那一节</p>
+<h2 id="设置环境"><a href="#设置环境" class="headerlink" title="设置环境"></a>设置环境</h2><p>&emsp;&emsp;使用 envsetup.sh 脚本初始化环境。请注意，将 source 替换成 .（一个点）可以省去一些字符，这种简写形式在文档中更为常用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">source build/envsetup.sh</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;或</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">build/envsetup.sh</div></pre></td></tr></table></figure>
+<h2 id="选择目标"><a href="#选择目标" class="headerlink" title="选择目标"></a>选择目标</h2><p>&emsp;&emsp;这里呢有二十多种模式，但好在<a href="https://source.android.com/source/running" target="_blank" rel="external">官方</a>给了个参考。在选择编译系统里，我们节选部分表格</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">设备</th>
+<th style="text-align:center">代号</th>
+<th style="text-align:center">编译配置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">Nexus 6</td>
+<td style="text-align:center">shamu</td>
+<td style="text-align:center">aosp_shamu-userdebug</td>
+</tr>
+<tr>
+<td style="text-align:center">Nexus Player</td>
+<td style="text-align:center">fugu</td>
+<td style="text-align:center">aosp_fugu-userdebug</td>
+</tr>
+<tr>
+<td style="text-align:center">Nexus 9</td>
+<td style="text-align:center">volantis (flounder)</td>
+<td style="text-align:center">aosp_flounder-userdebug</td>
+</tr>
+<tr>
+<td style="text-align:center">Nexus 5 (GSM/LTE)</td>
+<td style="text-align:center">hammerhead</td>
+<td style="text-align:center">aosp_hammerhead-userdebug</td>
+</tr>
+<tr>
+<td style="text-align:center">Nexus 7 (WLAN)</td>
+<td style="text-align:center">razor (flo)</td>
+<td style="text-align:center">aosp_flo-userdebug</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>&emsp;&emsp;有上表可见，这时候所需要的编译模式是aosp_hammerhead-userdebug。<br>&emsp;&emsp;输入下面的命令会给出一个列表让人选择</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">lunch</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;列表如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">You&apos;re building on Darwin</div><div class="line"></div><div class="line">Lunch menu... pick a combo:</div><div class="line">     1. aosp_arm-eng</div><div class="line">     2. aosp_arm64-eng</div><div class="line">     3. aosp_mips-eng</div><div class="line">     4. aosp_mips64-eng</div><div class="line">     5. aosp_x86-eng</div><div class="line">     6. aosp_x86_64-eng</div><div class="line">     7. aosp_deb-userdebug</div><div class="line">     8. aosp_flo-userdebug</div><div class="line">     9. full_fugu-userdebug</div><div class="line">     10. aosp_fugu-userdebug</div><div class="line">     11. mini_emulator_arm64-userdebug</div><div class="line">     12. m_e_arm-userdebug</div><div class="line">     13. mini_emulator_mips-userdebug</div><div class="line">     14. mini_emulator_x86-userdebug</div><div class="line">     15. mini_emulator_x86_64-userdebug</div><div class="line">     16. aosp_flounder-userdebug</div><div class="line">     17. aosp_angler-userdebug</div><div class="line">     18. aosp_bullhead-userdebug</div><div class="line">     19. aosp_hammerhead-userdebug</div><div class="line">     20. aosp_hammerhead_fp-userdebug</div><div class="line">     21. aosp_shamu-userdebug</div><div class="line"></div><div class="line">Which would you like? [aosp_arm-eng]</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;这时输入19就行。然后它会返回一个配置列表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">============================================</div><div class="line">PLATFORM_VERSION_CODENAME=REL</div><div class="line">PLATFORM_VERSION=6.0.1</div><div class="line">TARGET_PRODUCT=aosp_hammerhead</div><div class="line">TARGET_BUILD_VARIANT=userdebug</div><div class="line">TARGET_BUILD_TYPE=release</div><div class="line">TARGET_BUILD_APPS=</div><div class="line">TARGET_ARCH=arm</div><div class="line">TARGET_ARCH_VARIANT=armv7-a-neon</div><div class="line">TARGET_CPU_VARIANT=krait</div><div class="line">TARGET_2ND_ARCH=</div><div class="line">TARGET_2ND_ARCH_VARIANT=</div><div class="line">TARGET_2ND_CPU_VARIANT=</div><div class="line">HOST_ARCH=x86_64</div><div class="line">HOST_OS=darwin</div><div class="line">HOST_OS_EXTRA=Darwin-16.7.0-x86_64-i386-64bit</div><div class="line">HOST_BUILD_TYPE=release</div><div class="line">BUILD_ID=MMB29K</div><div class="line">OUT_DIR=out</div><div class="line">============================================</div></pre></td></tr></table></figure>
+<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><p>&emsp;&emsp;这个就简单</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">make -j4</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;选择了四个线程同时编译</p>
+<h1 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h1><p>&emsp;&emsp;在这个环境里，编译的时候是会报错的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">build/core/combo/mac_version.mk:39: * Can not find SDK 10.6 at /Developer/SDKs/MacOSX10.6.sdk</div><div class="line">build/core/combo/mac_version.mk:40: *****************************************************</div><div class="line">build/core/combo/mac_version.mk:41: *** Stop..  Stop.</div><div class="line"></div><div class="line">\e[0;31m#### make failed to build some targets (3 seconds) ####\e[00m</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;这个就很明显了，SDK的版本不对。我们去</p>
+<blockquote>
+<p>/Applications/XCode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs</p>
+</blockquote>
+<p>里面找找看，会发现只有10.12的SDK。<br>&emsp;&emsp;那么现在假设它是向下兼容的，那么我们试试能否强制用10.12的SDK编译。找到<em>build/core/combo/mac_version.mk</em>，在mac_sdk_versions_supported加上10.12</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mac_sdk_versions_supported :=  10.6 10.7 10.8 10.9 10.12</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;然后继续编译，这时后又是java版本不对，毕竟我们这个太老了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">Checking build tools versions...</div><div class="line">************************************************************</div><div class="line">You are attempting to build with the incorrect version</div><div class="line">of java.</div><div class="line"> </div><div class="line">Your version is: java version &quot;1.8.0_112&quot; Java(TM) SE Runtime Environment (build 1.8.0_112-b16) Java HotSpot(TM) 64-Bit Server VM (build 25.112-b16, mixed mode).</div><div class="line">The required version is: &quot;1.7.x&quot;</div><div class="line"> </div><div class="line">Please follow the machine setup instructions at</div><div class="line">    https://source.android.com/source/initializing.html</div><div class="line">************************************************************</div><div class="line">build/core/main.mk:171: *** stop.  Stop.</div><div class="line"></div><div class="line">\e[0;31m#### make failed to build some targets (13 seconds) ####\e[00m</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;好吧，这个要jdk1.7。可是我其他的项目还是主要要用java8呀，每次改JAVA_HOME也太麻烦了点。这时候就祭出神器<a href="https://github.com/gcuisinier/jenv" target="_blank" rel="external">jenv</a>了。它可以很方便的切换java版本，而且可以限定作用范围。虽然也能用<em>brew install jenv</em>安装，但是装完后，会出一些奇奇怪怪的问题，还是建议用<em>git clone</em>吧。至于具体操作，可以看它的<a href="https://github.com/gcuisinier/jenv" target="_blank" rel="external">github</a>的<a href="https://github.com/gcuisinier/jenv/blob/master/README.md" target="_blank" rel="external">readme</a>，命令也很简洁方便。</p>
+<p> &emsp;&emsp;切换到java7进行编译，然后还是会失败的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">system/core/libcutils/threads.c:38:10: error: &apos;syscall&apos; is deprecated: first deprecated in OS X 10.12 - syscall(2) is unsupported; please switch to a supported interface. For SYS_kdebug_trace use kdebug_signpost(). [-Werror,-Wdeprecated-declarations]</div><div class="line">  return syscall(SYS_thread_selfid);</div><div class="line">         ^</div><div class="line">../../Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/unistd.h:733:6: note: &apos;syscall&apos; has been explicitly marked deprecated here</div><div class="line">int      syscall(int, ...);</div><div class="line">         ^</div><div class="line">1 error generated.</div><div class="line">make: *** [out/host/darwin-x86/obj/STATIC_LIBRARIES/libcutils_intermediates/threads.o] Error 1</div><div class="line">make: *** Waiting for unfinished jobs....</div><div class="line"></div><div class="line">\e[0;31m#### make failed to build some targets (02:26 (mm:ss)) ####\e[00m</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;有个函数在MACOSX.SDK里被废除了。那用老版本的？去<a href="https://github.com/phracker/MacOSX-SDKs/releases" target="_blank" rel="external">https://github.com/phracker/MacOSX-SDKs/releases</a>下载<a href="https://github.com/phracker/MacOSX-SDKs/releases/download/10.13/MacOSX10.9.sdk.tar.xz" target="_blank" rel="external"><strong>MacOSX10.9.sdk.tar.xz</strong></a>，然后解压到</p>
+<blockquote>
+<p>/Applications/XCode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs</p>
+</blockquote>
+<p>&emsp;&emsp;选这个版本的原因是因为我们在前面的原始的<em>build/core/combo/mac_version.mk</em>看到支持的版本号最高是10.9。然后再编译一次试试</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">xcodebuild[42506:10928497] [MT] DVTSDK: Skipped SDK /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk; its version (10.9) is below required minimum (10.11) for the macosx platform.</div><div class="line">xcodebuild[42506:10928497] [MT] PluginLoading: Required plug-in compatibility UUID DFFB3951-EB0A-4C09-9DAC-5F2D28CC839C for plug-in at path &apos;~/Library/Application Support/Developer/Shared/Xcode/Plug-ins/ClangFormat.xcplugin&apos; not present in DVTPlugInCompatibilityUUIDs</div><div class="line">xcodebuild[42506:10928497] [MT] PluginLoading: Required plug-in compatibility UUID DFFB3951-EB0A-4C09-9DAC-5F2D28CC839C for plug-in at path &apos;~/Library/Application Support/Developer/Shared/Xcode/Plug-ins/Alcatraz.xcplugin&apos; not present in DVTPlugInCompatibilityUUIDs</div><div class="line">build/core/combo/mac_version.mk:38: *****************************************************</div><div class="line">build/core/combo/mac_version.mk:39: * Can not find SDK 10.6 at /Developer/SDKs/MacOSX10.6.sdk</div><div class="line">build/core/combo/mac_version.mk:40: *****************************************************</div><div class="line">build/core/combo/mac_version.mk:41: *** Stop..  Stop.</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;现在又说版本不能低于10.11。好吧，那重新下10.11，然后修改mac_version.mk，解压编译。</p>
+<p>&emsp;&emsp;编译成功后，会输出一个报告</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">Creating filesystem with parameters:</div><div class="line">    Size: 1073741824</div><div class="line">    Block size: 4096</div><div class="line">    Blocks per group: 32768</div><div class="line">    Inodes per group: 8192</div><div class="line">    Inode size: 256</div><div class="line">    Journal blocks: 4096</div><div class="line">    Label: system</div><div class="line">    Blocks: 262144</div><div class="line">    Block groups: 8</div><div class="line">    Reserved block group size: 63</div><div class="line">Created filesystem with 1701/65536 inodes and 106038/262144 blocks</div><div class="line">Install system fs image: out/target/product/hammerhead/system.img</div><div class="line">out/target/product/hammerhead/system.img+out/target/product/hammerhead/obj/PACKAGING/recovery_patch_intermediates/recovery_from_boot.p maxsize=1096212480 blocksize=135168 total=419150812 reserve=11083776</div><div class="line"></div><div class="line">\e[0;32m#### make completed successfully (02:51:38 (hh:mm:ss)) ####\e[00m</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;所用空间的大小，然后关键的那几个img，于是现在就可以刷机了。</p>
+<h1 id="刷机"><a href="#刷机" class="headerlink" title="刷机"></a>刷机</h1><p>&emsp;&emsp;Nexus5关机状态下,长按音量下+电源,即可进入recovery模式, 然后在源码根目录下执行下面命令:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">fastboot -w flashall</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;刷机成功后就会自动重启</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div></pre></td><td class="code"><pre><div class="line">target reported max download size of 1073741824 bytes</div><div class="line">Creating filesystem with parameters:</div><div class="line">    Size: 13725835264</div><div class="line">    Block size: 4096</div><div class="line">    Blocks per group: 32768</div><div class="line">    Inodes per group: 8144</div><div class="line">    Inode size: 256</div><div class="line">    Journal blocks: 32768</div><div class="line">    Label: </div><div class="line">    Blocks: 3351034</div><div class="line">    Block groups: 103</div><div class="line">    Reserved block group size: 823</div><div class="line">Created filesystem with 11/838832 inodes and 93654/3351034 blocks</div><div class="line">Creating filesystem with parameters:</div><div class="line">    Size: 734003200</div><div class="line">    Block size: 4096</div><div class="line">    Blocks per group: 32768</div><div class="line">    Inodes per group: 7472</div><div class="line">    Inode size: 256</div><div class="line">    Journal blocks: 2800</div><div class="line">    Label: </div><div class="line">    Blocks: 179200</div><div class="line">    Block groups: 6</div><div class="line">    Reserved block group size: 47</div><div class="line">Created filesystem with 11/44832 inodes and 5813/179200 blocks</div><div class="line">--------------------------------------------</div><div class="line">Bootloader Version...: HHZ20h</div><div class="line">Baseband Version.....: M8974A-2.0.50.2.30</div><div class="line">Serial Number........: 039da899215fcfec</div><div class="line">--------------------------------------------</div><div class="line">checking product...</div><div class="line">OKAY [  0.100s]</div><div class="line">sending &apos;boot&apos; (9160 KB)...</div><div class="line">OKAY [  0.500s]</div><div class="line">writing &apos;boot&apos;...</div><div class="line">OKAY [  0.788s]</div><div class="line">sending &apos;recovery&apos; (9898 KB)...</div><div class="line">OKAY [  0.563s]</div><div class="line">writing &apos;recovery&apos;...</div><div class="line">OKAY [  0.834s]</div><div class="line">erasing &apos;system&apos;...</div><div class="line">OKAY [  1.237s]</div><div class="line">sending &apos;system&apos; (408826 KB)...</div><div class="line">OKAY [ 13.012s]</div><div class="line">writing &apos;system&apos;...</div><div class="line">OKAY [ 29.164s]</div><div class="line">erasing &apos;userdata&apos;...</div><div class="line">OKAY [ 10.458s]</div><div class="line">sending &apos;userdata&apos; (137318 KB)...</div><div class="line">OKAY [  4.511s]</div><div class="line">writing &apos;userdata&apos;...</div><div class="line">OKAY [  9.153s]</div><div class="line">erasing &apos;cache&apos;...</div><div class="line">OKAY [  0.670s]</div><div class="line">sending &apos;cache&apos; (13348 KB)...</div><div class="line">OKAY [  0.631s]</div><div class="line">writing &apos;cache&apos;...</div><div class="line">OKAY [  1.062s]</div><div class="line">rebooting...</div><div class="line"></div><div class="line">finished. total time: 73.191s</div></pre></td></tr></table></figure>
+<h1 id="展示一下成果"><a href="#展示一下成果" class="headerlink" title="展示一下成果"></a>展示一下成果</h1><img src="/images/Nexus5.png" title="成功后的界面">
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java/" rel="tag"># java</a>
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Nexus5固件/" rel="tag"># Nexus5固件</a>
+          
+            <a href="/tags/编译Android源码/" rel="tag"># 编译Android源码</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/10/对java中关于文件读取方法效率的比较/" rel="next" title="对java中关于文件读取方法效率的比较">
+                <i class="fa fa-chevron-left"></i> 对java中关于文件读取方法效率的比较
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="djjowfy" />
+          <p class="site-author-name" itemprop="name">djjowfy</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">26</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Links
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://www.rapospectre.com/" title="RaPoSpectre" target="_blank">RaPoSpectre</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://shadowwood.me" title="ShadowWood" target="_blank">ShadowWood</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://ziriwong.cc/" title="ZiriWong" target="_blank">ZiriWong</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lumiaxu.com/" title="Lumia Xu" target="_blank">Lumia Xu</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://vkwk.space/" title="Viking Warlock" target="_blank">Viking Warlock</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://toxni.com/" title="Toxni" target="_blank">Toxni</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#初始编译环境"><span class="nav-number">2.</span> <span class="nav-text">初始编译环境</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#初始工作"><span class="nav-number">3.</span> <span class="nav-text">初始工作</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#构建"><span class="nav-number">4.</span> <span class="nav-text">构建</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#下载驱动"><span class="nav-number">4.1.</span> <span class="nav-text">下载驱动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#清理"><span class="nav-number">4.2.</span> <span class="nav-text">清理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#设置环境"><span class="nav-number">4.3.</span> <span class="nav-text">设置环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#选择目标"><span class="nav-number">4.4.</span> <span class="nav-text">选择目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译"><span class="nav-number">4.5.</span> <span class="nav-text">编译</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#遇到的问题"><span class="nav-number">5.</span> <span class="nav-text">遇到的问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#刷机"><span class="nav-number">6.</span> <span class="nav-text">刷机</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#展示一下成果"><span class="nav-number">7.</span> <span class="nav-text">展示一下成果</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">djjowfy</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://djjowfy.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2017/09/15/如何在MacOS10.12.6中为Nexus5编译M固件/';
+          this.page.identifier = '2017/09/15/如何在MacOS10.12.6中为Nexus5编译M固件/';
+          this.page.title = '如何在MacOS10.12.6中为Nexus5编译M固件';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://djjowfy.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("pekgUTl1Fh2Mub6DgpTGudPi-gzGzoHsz", "6VjRvGEJvzOnuLafhOj7A01o");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+          inlineMath: [ ['$', '$'] ],
+          displayMath: [ ['$$', '$$']],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        messageStyle: "none",
+        "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>
