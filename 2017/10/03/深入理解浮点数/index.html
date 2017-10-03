@@ -74,7 +74,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="java,retrofit,Rxjava,response body,Android," />
+  <meta name="keywords" content="浮点数,计算机基础,计算机组成原理," />
 
 
 
@@ -90,16 +90,21 @@
 
 
 
-<meta name="description" content="&amp;emsp;&amp;emsp;一个典型的retrofit+Rxjava的网络请求如下12345678910111213141516Subscription subscription = videoChartService.login(newBody)                .observeOn(AndroidSchedulers.mainThread())                .sub">
+<meta name="description" content="前言&amp;emsp;&amp;emsp;浮点数因为它的独特的表示方法，造成了比整数表示复杂的多的情况。而在程序中却不得不经常跟浮点数打交道。最近在看《深入理解计算机系统》，于是就想把与浮点数相关的东西整理出来，方便以后翻阅。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="当使用retrofit+Rxjava时，如何得到非200响应的body">
-<meta property="og:url" content="http://yoursite.com/2016/04/29/当使用retrofit+Rxjava时，如何得到非200响应的body/index.html">
+<meta property="og:title" content="深入理解浮点数">
+<meta property="og:url" content="http://yoursite.com/2017/10/03/深入理解浮点数/index.html">
 <meta property="og:site_name" content="djjowfy">
-<meta property="og:description" content="&amp;emsp;&amp;emsp;一个典型的retrofit+Rxjava的网络请求如下12345678910111213141516Subscription subscription = videoChartService.login(newBody)                .observeOn(AndroidSchedulers.mainThread())                .sub">
-<meta property="og:updated_time" content="2017-09-15T13:10:56.000Z">
+<meta property="og:description" content="前言&amp;emsp;&amp;emsp;浮点数因为它的独特的表示方法，造成了比整数表示复杂的多的情况。而在程序中却不得不经常跟浮点数打交道。最近在看《深入理解计算机系统》，于是就想把与浮点数相关的东西整理出来，方便以后翻阅。">
+<meta property="og:image" content="http://yoursite.com/images/科学计数法.png">
+<meta property="og:image" content="http://yoursite.com/images/浮点数的机器码表示.png">
+<meta property="og:image" content="http://yoursite.com/images/单精度规格数的数轴表示.png">
+<meta property="og:image" content="http://yoursite.com/images/单精度规格化数近零分布.png">
+<meta property="og:updated_time" content="2017-10-03T14:06:10.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="当使用retrofit+Rxjava时，如何得到非200响应的body">
-<meta name="twitter:description" content="&amp;emsp;&amp;emsp;一个典型的retrofit+Rxjava的网络请求如下12345678910111213141516Subscription subscription = videoChartService.login(newBody)                .observeOn(AndroidSchedulers.mainThread())                .sub">
+<meta name="twitter:title" content="深入理解浮点数">
+<meta name="twitter:description" content="前言&amp;emsp;&amp;emsp;浮点数因为它的独特的表示方法，造成了比整数表示复杂的多的情况。而在程序中却不得不经常跟浮点数打交道。最近在看《深入理解计算机系统》，于是就想把与浮点数相关的东西整理出来，方便以后翻阅。">
+<meta name="twitter:image" content="http://yoursite.com/images/科学计数法.png">
 
 
 
@@ -127,13 +132,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2016/04/29/当使用retrofit+Rxjava时，如何得到非200响应的body/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/10/03/深入理解浮点数/"/>
 
 
 
 
 
-  <title>当使用retrofit+Rxjava时，如何得到非200响应的body | djjowfy</title>
+  <title>深入理解浮点数 | djjowfy</title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -273,7 +278,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/04/29/当使用retrofit+Rxjava时，如何得到非200响应的body/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/03/深入理解浮点数/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="djjowfy">
@@ -290,7 +295,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">当使用retrofit+Rxjava时，如何得到非200响应的body</h2>
+          <h2 class="post-title" itemprop="name headline">深入理解浮点数</h2>
         
 
         <div class="post-meta">
@@ -302,8 +307,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-04-29T12:00:00+08:00">
-                2016-04-29
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-03T12:00:00+08:00">
+                2017-10-03
               </time>
             
 
@@ -336,8 +341,8 @@
                 
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/原创/Android/" itemprop="url" rel="index">
-                    <span itemprop="name">Android</span>
+                  <a href="/categories/原创/计算机基础/" itemprop="url" rel="index">
+                    <span itemprop="name">计算机基础</span>
                   </a>
                 </span>
 
@@ -354,9 +359,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2016/04/29/当使用retrofit+Rxjava时，如何得到非200响应的body/#comments" itemprop="discussionUrl">
+                <a href="/2017/10/03/深入理解浮点数/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2016/04/29/当使用retrofit+Rxjava时，如何得到非200响应的body/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2017/10/03/深入理解浮点数/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -364,7 +369,7 @@
 
           
           
-             <span id="/2016/04/29/当使用retrofit+Rxjava时，如何得到非200响应的body/" class="leancloud_visitors" data-flag-title="当使用retrofit+Rxjava时，如何得到非200响应的body">
+             <span id="/2017/10/03/深入理解浮点数/" class="leancloud_visitors" data-flag-title="深入理解浮点数">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -392,16 +397,142 @@
       
 
       
-        <p>&emsp;&emsp;一个典型的retrofit+Rxjava的网络请求如下<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">Subscription subscription = videoChartService.login(newBody)</div><div class="line">                .observeOn(AndroidSchedulers.mainThread())</div><div class="line">                .subscribeOn(application.defaultSubscribeScheduler())</div><div class="line">                .subscribe(<span class="keyword">new</span> Subscriber&lt;LoginResponse&gt;() &#123;</div><div class="line">                    <span class="meta">@Override</span></div><div class="line">                    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCompleted</span><span class="params">()</span> </span>&#123;</div><div class="line">                    &#125;</div><div class="line"></div><div class="line">                    <span class="meta">@Override</span></div><div class="line">                    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onError</span><span class="params">(Throwable error)</span> </span>&#123;</div><div class="line">                    &#125;</div><div class="line"></div><div class="line">                    <span class="meta">@Override</span></div><div class="line">                    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onNext</span><span class="params">(LoginResponse loginResponse)</span> </span>&#123;</div><div class="line">                    &#125;</div><div class="line">                &#125;);</div></pre></td></tr></table></figure></p>
-<p>&emsp;&emsp;我们知道如果成功我们可以从onNext里的Response里面来取出返回来的body。但是如果失败了，如何取出返回来的body呢？？<br><a id="more"></a></p>
-<p>&emsp;&emsp;根据文档，失败后会进入onError里面。但这个只是个Throwable类，如果直接tostring的话，我们可以看见它是只打印类返回的头部。所以看看能否向下转型，然后取出body。</p>
-<p>&emsp;&emsp;这时我们故意发送一个失败请求，可以看见，打印出来的异常是</p>
-<blockquote>
-<p>retrofit.HttpException</p>
-</blockquote>
-<p>&emsp;&emsp;所以现在我们对它进行向下转型，onError里面代码如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onError</span><span class="params">(Throwable e)</span> </span>&#123;</div><div class="line">  <span class="keyword">if</span>(e <span class="keyword">instanceof</span> HttpException)&#123;</div><div class="line">     ResponseBody body = ((HttpException) e).response().errorBody();</div><div class="line">     <span class="keyword">try</span> &#123;</div><div class="line">                MyLog.Error(body.string());</div><div class="line">          &#125; <span class="keyword">catch</span> (IOException IOe) &#123;</div><div class="line">                IOe.printStackTrace();</div><div class="line">          &#125;</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>&emsp;&emsp;好了，现在打印出来的就是body了，注意是errorBody.string而不是errorBody.toString，不然它打印出来的只是地址。现在可用Gson等等各种方法了。</p>
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&emsp;&emsp;浮点数因为它的独特的表示方法，造成了比整数表示复杂的多的情况。而在程序中却不得不经常跟浮点数打交道。最近在看《深入理解计算机系统》，于是就想把与浮点数相关的东西整理出来，方便以后翻阅。<br><a id="more"></a></p>
+<h1 id="浮点数的表示"><a href="#浮点数的表示" class="headerlink" title="浮点数的表示"></a>浮点数的表示</h1><h2 id="从科学计数法讲起"><a href="#从科学计数法讲起" class="headerlink" title="从科学计数法讲起"></a>从科学计数法讲起</h2><p>&emsp;&emsp;在初高中学过的科学计数法是一种很美妙的表示方法，它可以很容易地表示很小的数和很大的数。下面就是一个十进制数的科学计数法表示：</p>
+<img src="/images/科学计数法.png" width="420" height="251" title="图一 科学计数法的例子">
+<p>&emsp;&emsp;浮点数的表示方法也和科学技术法类似。通过观察，很容易就发现，因为尾数的整数部分总为1，于是在存储的时候只用存储小数即可。而对于基呢，只要约定好，那完全可以不用占存储空间。这些数据的存储却和整数的存储不一样，用的不是补码。因为用补码的话，会给浮点数的比较造成困难。对于指数，为了方便比较，用的是移码表示，也就是说，在原码上加上一个偏置量，让其变为一个非负数。而非负数的比较完全可以从最高有效位遍历比较，对于硬件设计来说方便快捷。而尾数的小数部分就按一般的二进制小数来存储。因此，对于浮点数来讲，需要存储的就三个部分的数据，尾数的小数部分，符号以及指数。为了区分，现在把指数加上偏执量，也就是实际存储的数据称为阶码。</p>
+<img src="/images/浮点数的机器码表示.png" width="620" height="125" title="图二 浮点数的机器码表示">
+<p>&emsp;&emsp;那么，一个浮点数与机器码的对应形式如下，为了方便，假设基为2：</p>
+<script type="math/tex; mode=display">
+V = (-1)^S \times (1 + frac) \times 2^{(exp - bias)}</script><p>&emsp;&emsp;bias表示的就是移码的偏置量。那么这个偏置量应该是多少呢？</p>
+<p>&emsp;&emsp;因为exp为k比特的二进制数，所以它最大值为$2^k - 1$。所以为了它实际表示的指数对称，那么偏置量的取值应该是$\frac {2^k - 1} {2}$左右。于是，现在这个问题就变成了，偏置量是要选$2^{k - 1}$还是$2^{k - 1} - 1$的问题。</p>
+<p>&emsp;&emsp;很明显，偏置量取$2^{k - 1} - 1$比取$2^{k - 1}$，所能表示的浮点数范围大一倍。所以显而易见的，偏置量应该选取$2^{k - 1} - 1$。</p>
+<h2 id="IEEE的浮点表示"><a href="#IEEE的浮点表示" class="headerlink" title="IEEE的浮点表示"></a>IEEE的浮点表示</h2><p>&emsp;&emsp;在很久以前，浮点数很多公司所用的基都不一样。所以为了统一标准，比如基到底是多少比较恰当。IEEE就定了个IEEE754标准来约定，这样方便程序的移植和通用。</p>
+<p>&emsp;&emsp;IEEE754规定了基为2，然后还规定了三种情况的值:规格化数，非规格化数，特殊数（无穷大和NaN）。</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">情况</th>
+<th style="text-align:center">exp</th>
+<th style="text-align:center">frac</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">规格化数</td>
+<td style="text-align:center">既不全0也不全1</td>
+<td style="text-align:center">\</td>
+</tr>
+<tr>
+<td style="text-align:center">非规格化数</td>
+<td style="text-align:center">全0</td>
+<td style="text-align:center">\</td>
+</tr>
+<tr>
+<td style="text-align:center">无穷大</td>
+<td style="text-align:center">全1</td>
+<td style="text-align:center">全0</td>
+</tr>
+<tr>
+<td style="text-align:center">NaN</td>
+<td style="text-align:center">全1</td>
+<td style="text-align:center">不等于0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>&emsp;&emsp;又提出了浮点数的几种类型，float，double和long double。 需要注意的是long double在标准里并没有明确的规定，但标准中对于扩展做了规定，所以下表中的Quadruple和Extended都是合法的。像Intel的协处理器在中间过程中用的就是Extended，为了保持精度。</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">参数</th>
+<th style="text-align:center">Single</th>
+<th style="text-align:center">Double</th>
+<th style="text-align:center">Quadruple</th>
+<th style="text-align:center">Extended</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">阶码的位宽</td>
+<td style="text-align:center">8</td>
+<td style="text-align:center">11</td>
+<td style="text-align:center">15</td>
+<td style="text-align:center">15</td>
+</tr>
+<tr>
+<td style="text-align:center">尾数中的小数部分的位宽</td>
+<td style="text-align:center">23</td>
+<td style="text-align:center">52</td>
+<td style="text-align:center">112</td>
+<td style="text-align:center">64</td>
+</tr>
+<tr>
+<td style="text-align:center">符号位的位宽</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">总位宽</td>
+<td style="text-align:center">32</td>
+<td style="text-align:center">64</td>
+<td style="text-align:center">128</td>
+<td style="text-align:center">80</td>
+</tr>
+<tr>
+<td style="text-align:center">C语言类型</td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">double</td>
+<td style="text-align:center">long double</td>
+<td style="text-align:center">long double</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>&emsp;&emsp;为了方便，下面都是默认以单精度作为例子。</p>
+<h3 id="规格化数"><a href="#规格化数" class="headerlink" title="规格化数"></a>规格化数</h3><p>&emsp;&emsp;规格化数是最普遍的形式。它的阶码既不是全零也不是全一。那么这时候。它的最大值的时候就是他的阶码为除了最后一位为0，其他全为1，尾数的小数部分全为1的时候，这时，用十进制表示就是是$(2 - 2^{-23}) \times 2^{127}$，同理可得最小的正数是$ 2^{-126}$ 。于是就能在数轴上如下图表示。</p>
+<img src="/images/单精度规格数的数轴表示.png" width="620" height="108" title="图三 单精度规格化数的数轴表示">
+<p>&emsp;&emsp;可以看见靠近0的地方有个gap，把正数部分的gap附近放大，可以画出大致分布如下图：</p>
+<img src="/images/单精度规格化数近零分布.png" width="620" height="137" title="图四 单精度规格化数近零分布">
+<p>&emsp;&emsp;很明显，阶码每大一，所占的范围就翻一倍，而尾数所能表示的个数确实不变的。那也就是说上图中，每段区域里的数值间隔都比左边邻近它区域里的数值间隔大一倍，越靠右的区域越大也越稀疏。最小的区域也就是[$2^{-126}$, $2^{-125}$)里的数值之间的间隔是$2^{-23} \times 2^{-126}$，也就说比前面的GAP小$2^{-23}$倍，这就给实际使用带来很多的不变，于是就有了下面的非规格化数。</p>
+<h3 id="非规格化数"><a href="#非规格化数" class="headerlink" title="非规格化数"></a>非规格化数</h3><p>&emsp;&emsp;根据上面的讨论，非规格化数就是为了填gap，实现一下均匀过渡的。很明显，正上溢区，也就是上图中的GAP的长度是$2^{-126}$，而非规格化的个数就是尾数所能表达的所有值，一个有$2^{23}$个，那么若均匀分布，间隔就是$2^{-23} \times 2^{-126}$。</p>
+<p>&emsp;&emsp;IEEE委员会也是这么考虑的，规定指数为$1-bias$。因为单精度的bias就是127，那么指数就是$-126$，这完全和我们刚才的讨论一样。</p>
+<p>&emsp;&emsp;于是非规格化数和机器码的对应公式如下</p>
+<script type="math/tex; mode=display">
+V = (-1)^S \times  frac \times 2^{(1 - bias)}</script><p>&emsp;&emsp;当然因为非规格数的指数是固定的，于是也就不用存储指数，因此，机器码里的阶码全为0，这也方便和规格化数分开。</p>
+<p>&emsp;&emsp;因此，非规格化数的有以下两个作用</p>
+<ul>
+<li><p>给出了一个对零的表示方法，并且正负零的机器码还不一样。因为规格化数的整数部分总是1，所有它并不能表示零。</p>
+</li>
+<li><p>表示那些非常接近零的数。也就是前面的负下溢区和正下溢区里面的数值。</p>
+</li>
+</ul>
+<h3 id="特殊数"><a href="#特殊数" class="headerlink" title="特殊数"></a>特殊数</h3><p>&emsp;&emsp;最后的这类数值有正负无穷大和NaN。他们是在阶码为1的时候表示的。</p>
+<h1 id="浮点数的运算及其精度"><a href="#浮点数的运算及其精度" class="headerlink" title="浮点数的运算及其精度"></a>浮点数的运算及其精度</h1><p>&emsp;&emsp;浮点数的运算，就相当于指数运算。因为非规划数的指数相同，就对尾数进行计算即可。重点在规划数上，现设两规格化浮点数分别为 $A = M_a \cdot 2^{E_a}, B = M_b \cdot 2^{E_b}$，则：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+A \pm B &= (M_a \pm M_b \cdot 2^{-(E_a - E_b)}) \cdot 2^{E_a} \ \ \ \ (if E_a \geq E_b) \\
+A \ast B &= (M_a \ast M_b) \cdot 2^{E_a + E_b} \\
+A \div B &= (M_a \div M_b) \cdot 2^{E_a - E_b} 
+\end{align}</script><p>&emsp;&emsp;为了方便，现只针对加法运算进行讨论。</p>
+<p>&emsp;&emsp;因为数据的存储长度是固定的，那么在加减运算时对阶后，可能会造成很大的精度损失。假设现在进行的是有效位只有三位的加法运算，$1.99 + 4.56 <em> 10^2$，那么首先需要对阶。理应变成$0.0199 </em> 10^2 + 4.56<em>10^2 = (0.0199 + 4.56) </em> 10^2$，而因为位宽限制，只能变成$(0.01 + 4.56) * 10^2$。这样就会造成很大的精度损失。于是IEEE就规定中间结果必须有两个附加位。它的作用就是左规（结果的整数部分大于1位，这样需要小数点左移，指数变大）和作为最终结果舍入时的参考。</p>
+<p>&emsp;&emsp;至于舍入，IEEE规定了四种方式：</p>
+<ul>
+<li>向最近的浮点数舍入（默认方式）</li>
+<li>向正无穷舍入</li>
+<li>向负无穷舍入</li>
+<li>向零舍入</li>
+</ul>
+<p>&emsp;&emsp;其实舍入，说白了就是因为有效位的限制，所以紧扣有效位，完全能避开舍入陷阱。</p>
+<ul>
+<li>从int转化为float时，因为float所能表示的数据范围远大于int，所以不会发生溢出。但是因为他们两个的位宽是一样的，所以很可能会发生舍入。</li>
+<li>从int或者float转化为double时，因为double的范围更大，有效位更多，所以能完全保留精确值。</li>
+<li>从double转换为float和int时，因为double的范围更大，有效位更多，所以可能会溢出，也可能会舍入。<br>-从float或double转化为int时，因为int没有小数部分，所以值会向零舍入。如果没有找到对应的整数，比如(int)1e10，那么这是个未定义行为。Intel的方法是将它变为一个整数不确定值（MSB为1，其余为0）。</li>
+</ul>
 
       
     </div>
@@ -431,15 +562,11 @@
       
         <div class="post-tags">
           
-            <a href="/tags/java/" rel="tag"># java</a>
+            <a href="/tags/浮点数/" rel="tag"># 浮点数</a>
           
-            <a href="/tags/retrofit/" rel="tag"># retrofit</a>
+            <a href="/tags/计算机基础/" rel="tag"># 计算机基础</a>
           
-            <a href="/tags/Rxjava/" rel="tag"># Rxjava</a>
-          
-            <a href="/tags/response-body/" rel="tag"># response body</a>
-          
-            <a href="/tags/Android/" rel="tag"># Android</a>
+            <a href="/tags/计算机组成原理/" rel="tag"># 计算机组成原理</a>
           
         </div>
       
@@ -452,8 +579,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/04/27/依赖注入在java中的使用/" rel="next" title="依赖注入在java中的使用">
-                <i class="fa fa-chevron-left"></i> 依赖注入在java中的使用
+              <a href="/2017/09/15/如何在MacOS10.12.6中为Nexus5编译M固件/" rel="next" title="如何在MacOS10.12.6中为Nexus5编译M固件">
+                <i class="fa fa-chevron-left"></i> 如何在MacOS10.12.6中为Nexus5编译M固件
               </a>
             
           </div>
@@ -461,10 +588,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/11/13/PageRank初探/" rel="prev" title="PageRank初探">
-                PageRank初探 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -541,8 +664,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.jpg"
@@ -642,6 +774,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#浮点数的表示"><span class="nav-number">2.</span> <span class="nav-text">浮点数的表示</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#从科学计数法讲起"><span class="nav-number">2.1.</span> <span class="nav-text">从科学计数法讲起</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IEEE的浮点表示"><span class="nav-number">2.2.</span> <span class="nav-text">IEEE的浮点表示</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#规格化数"><span class="nav-number">2.2.1.</span> <span class="nav-text">规格化数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#非规格化数"><span class="nav-number">2.2.2.</span> <span class="nav-text">非规格化数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#特殊数"><span class="nav-number">2.2.3.</span> <span class="nav-text">特殊数</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#浮点数的运算及其精度"><span class="nav-number">3.</span> <span class="nav-text">浮点数的运算及其精度</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -779,9 +927,9 @@
     
       <script type="text/javascript">
         var disqus_config = function () {
-          this.page.url = 'http://yoursite.com/2016/04/29/当使用retrofit+Rxjava时，如何得到非200响应的body/';
-          this.page.identifier = '2016/04/29/当使用retrofit+Rxjava时，如何得到非200响应的body/';
-          this.page.title = '当使用retrofit+Rxjava时，如何得到非200响应的body';
+          this.page.url = 'http://yoursite.com/2017/10/03/深入理解浮点数/';
+          this.page.identifier = '2017/10/03/深入理解浮点数/';
+          this.page.title = '深入理解浮点数';
         };
         var d = document, s = d.createElement('script');
         s.src = 'https://djjowfy.disqus.com/embed.js';
